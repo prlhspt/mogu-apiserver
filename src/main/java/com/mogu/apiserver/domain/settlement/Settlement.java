@@ -1,7 +1,6 @@
 package com.mogu.apiserver.domain.settlement;
 
 import com.mogu.apiserver.domain.BaseEntity;
-import com.mogu.apiserver.domain.nonuser.NonUser;
 import com.mogu.apiserver.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,9 +19,7 @@ public class Settlement extends BaseEntity {
     private Long meetingId;
     private Long totalPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @ManyToOne
-    private NonUser nonUser;
 }

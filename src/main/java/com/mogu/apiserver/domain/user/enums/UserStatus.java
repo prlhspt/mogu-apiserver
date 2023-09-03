@@ -1,11 +1,11 @@
-package com.mogu.apiserver.domain.nonuser;
+package com.mogu.apiserver.domain.user.enums;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum NonUserStatus {
+public enum UserStatus {
     ACTIVE("활성화"),
     INACTIVE("비활성화");
 
-    private final String text;
+    private final String description;
 }

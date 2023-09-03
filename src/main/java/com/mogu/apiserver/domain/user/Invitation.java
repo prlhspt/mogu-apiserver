@@ -15,10 +15,10 @@ public class Invitation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User inviterUser;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User inviteeUser;
 
     private String code;
