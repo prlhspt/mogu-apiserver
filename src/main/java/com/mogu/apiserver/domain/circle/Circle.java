@@ -1,4 +1,4 @@
-package com.mogu.apiserver.domain.meeting;
+package com.mogu.apiserver.domain.circle;
 
 import com.mogu.apiserver.domain.BaseEntity;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Meeting extends BaseEntity {
+public class Circle extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

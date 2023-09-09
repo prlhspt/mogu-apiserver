@@ -1,7 +1,9 @@
 package com.mogu.apiserver.domain.authentication;
 
+import com.mogu.apiserver.domain.authentication.exception.InvalidRefreshTokenException;
 import com.mogu.apiserver.global.property.JwtProperty;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -12,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
@@ -22,34 +22,66 @@ public class JwtTokenProvider {
 
     private final JwtProperty jwtProperty;
 
+    public Long getAccessTokenExpireTime() {
+        return jwtProperty.accessTokenExpireTime;
+    }
+
+    public Long getRefreshTokenExpireTime() {
+        return jwtProperty.refreshTokenExpireTime;
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    public String generateAccessToken(UserDetails userDetails, Long expireTime) {
+        Claims claims = Jwts.claims();
+        claims.put("token_type", "access");
+        return generateAccessToken(claims, userDetails, expireTime);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
+    public String generateAccessToken(
+            Claims extraClaims,
+            UserDetails userDetails,
+            Long expireTime
     ) {
-        return buildToken(extraClaims, userDetails, jwtProperty.accessTokenExpireTime);
+        return buildToken(extraClaims, userDetails, expireTime);
     }
 
     public String generateRefreshToken(
-            UserDetails userDetails
+            UserDetails userDetails,
+            Long expireTime
     ) {
-        return buildToken(new HashMap<>(), userDetails, jwtProperty.refreshTokenExpireTime);
+        Claims claims = Jwts.claims();
+        claims.put("token_type", "refresh");
+        return buildToken(claims, userDetails, expireTime);
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
+    }
+
+    public String refreshToken(String token, UserDetails userDetails, Long expireTime) {
+        if (!isTokenValid(token, userDetails) || !isRefreshToken(token)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        Claims claims = extractAllClaims(token);
+
+
+
+        System.out.println("claims = " + claims);
+        return generateAccessToken(userDetails, expireTime);
+
     }
 
     private String buildToken(
-            Map<String, Object> extraClaims,
+            Claims extraClaims,
             UserDetails userDetails,
             long expiration
     ) {
@@ -63,9 +95,9 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
     private boolean isTokenExpired(String token) {
@@ -88,5 +120,9 @@ public class JwtTokenProvider {
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(jwtProperty.secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private boolean isRefreshToken(String token) {
+        return extractClaim(token, claims -> claims.get("token_type", String.class)).equals("refresh");
     }
 }

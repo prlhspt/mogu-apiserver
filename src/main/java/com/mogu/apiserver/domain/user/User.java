@@ -38,4 +38,7 @@ public class User {
         this.status = status;
     }
 
+    public boolean isActivated() {
+        return this.status == UserStatus.ACTIVE;
+    }
 }

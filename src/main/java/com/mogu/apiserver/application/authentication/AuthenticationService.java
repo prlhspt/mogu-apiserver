@@ -1,19 +1,22 @@
 package com.mogu.apiserver.application.authentication;
 
+import com.mogu.apiserver.application.authentication.request.AccountLoginServiceRequest;
+import com.mogu.apiserver.application.authentication.request.RegisterServiceRequest;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.AccountPrincipal;
+import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.authentication.JwtTokenProvider;
+import com.mogu.apiserver.domain.authentication.exception.InvalidRefreshTokenException;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
-import com.mogu.apiserver.domain.user.exception.AlreadyExistLoginIdException;
-import com.mogu.apiserver.domain.user.exception.UserNotFoundException;
+import com.mogu.apiserver.domain.user.exception.AlreadyExistEmailException;
+import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.infrastructure.account.AccountJpaRepository;
 import com.mogu.apiserver.infrastructure.account.AccountRepository;
 import com.mogu.apiserver.infrastructure.user.UserRepository;
-import com.mogu.apiserver.presentation.authentication.request.AccountLoginRequest;
-import com.mogu.apiserver.presentation.authentication.request.RegisterRequest;
 import com.mogu.apiserver.presentation.authentication.response.AccountLoginResponse;
+import com.mogu.apiserver.presentation.authentication.response.RefreshTokenResponse;
 import com.mogu.apiserver.presentation.authentication.response.RegisterResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,11 +36,12 @@ public class AuthenticationService {
     private final UserRepository userRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
+
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public RegisterResponse registerUser(RegisterRequest request) {
+    public RegisterResponse registerUser(RegisterServiceRequest request) {
 
         duplicateEmailValidation(request.getEmail());
 
@@ -47,7 +51,6 @@ public class AuthenticationService {
                 .type(UserType.USER)
                 .build();
 
-        userRepository.save(user);
 
         Account account = Account.builder()
                 .email(request.getEmail())
@@ -57,16 +60,17 @@ public class AuthenticationService {
 
         account.setUser(user);
 
+        userRepository.save(user);
         accountJpaRepository.save(account);
 
         AccountPrincipal accountPrincipal = AccountPrincipal.builder()
-                .username(request.getEmail())
-                .password(request.getPassword())
-                .userTypes(user.getType())
+                .username(account.getEmail())
+                .password(account.getPassword())
+                .userTypes(account.getUser().getType())
                 .build();
 
-        String accessToken = jwtTokenProvider.generateToken(accountPrincipal);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal);
+        String accessToken = jwtTokenProvider.generateAccessToken(accountPrincipal, jwtTokenProvider.getAccessTokenExpireTime());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal, jwtTokenProvider.getRefreshTokenExpireTime());
 
         return RegisterResponse.builder()
                 .accessToken(accessToken)
@@ -74,8 +78,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    @Transactional
-    public AccountLoginResponse login(AccountLoginRequest request) {
+    public AccountLoginResponse login(AccountLoginServiceRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -84,16 +87,21 @@ public class AuthenticationService {
         );
 
         Account account = accountRepository.findByEmailWithUser(request.getEmail())
-                .orElseThrow(() -> new UserNotFoundException());
+                .orElseThrow(AccountNotFoundException::new);
+
+        if (!account.getUser().isActivated()) {
+            throw new InactivateUserException();
+        }
 
         AccountPrincipal accountPrincipal = AccountPrincipal.builder()
-                .username(request.getEmail())
-                .password(request.getPassword())
+                .username(account.getEmail())
+                .password(account.getPassword())
                 .userTypes(account.getUser().getType())
                 .build();
 
-        String accessToken = jwtTokenProvider.generateToken(accountPrincipal);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal);
+
+        String accessToken = jwtTokenProvider.generateAccessToken(accountPrincipal, jwtTokenProvider.getAccessTokenExpireTime());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal, jwtTokenProvider.getRefreshTokenExpireTime());
 
         return AccountLoginResponse.builder()
                 .accessToken(accessToken)
@@ -101,9 +109,40 @@ public class AuthenticationService {
                 .build();
     }
 
+    public RefreshTokenResponse refresh(String token) {
+        if (token == null) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        String email = jwtTokenProvider.extractUsername(token);
+        if (email == null) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        Account account = accountRepository.findByEmailWithUser(email)
+                .orElseThrow(AccountNotFoundException::new);
+
+        if (!account.getUser().isActivated()) {
+            throw new InactivateUserException();
+        }
+
+        AccountPrincipal accountPrincipal = AccountPrincipal.builder()
+                .username(account.getEmail())
+                .password(account.getPassword())
+                .userTypes(account.getUser().getType())
+                .build();
+
+        String accessToken = jwtTokenProvider.refreshToken(token, accountPrincipal, jwtTokenProvider.getAccessTokenExpireTime());
+
+        return RefreshTokenResponse.builder()
+                .accessToken(accessToken)
+                .build();
+
+    }
+
     private void duplicateEmailValidation(String email) {
         if (accountJpaRepository.existsByEmailAllIgnoreCase(email)) {
-            throw new AlreadyExistLoginIdException();
+            throw new AlreadyExistEmailException();
         }
 
     }

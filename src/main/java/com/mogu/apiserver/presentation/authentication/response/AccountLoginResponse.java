@@ -1,17 +1,17 @@
 package com.mogu.apiserver.presentation.authentication.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 public class AccountLoginResponse {
 
-    @JsonProperty("access_token")
-    private String accessToken;
+    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNjI5MjU0NjY2LCJ", description = "JWT Access Token")
+    private final String accessToken;
 
-    @JsonProperty("refresh_token")
-    private String refreshToken;
+    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNjI5MjU0NjY2LCJ", description = "JWT Refresh Token")
+    private final String refreshToken;
 
     @Builder
     public AccountLoginResponse(String accessToken, String refreshToken) {

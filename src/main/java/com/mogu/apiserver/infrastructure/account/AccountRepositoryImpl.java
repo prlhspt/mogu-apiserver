@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static com.mogu.apiserver.domain.account.QAccount.*;
+import static com.mogu.apiserver.domain.account.QAccount.account;
 import static com.mogu.apiserver.domain.user.QUser.user;
 
 @Repository
@@ -22,6 +22,7 @@ public class AccountRepositoryImpl implements AccountRepository {
                 .selectFrom(account)
                 .join(account.user, user).fetchJoin()
                 .where(account.email.eq(email))
-                .fetchOne());
+                .fetchOne()
+        );
     }
 }

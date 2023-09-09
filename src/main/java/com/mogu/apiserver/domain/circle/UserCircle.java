@@ -1,4 +1,4 @@
-package com.mogu.apiserver.domain.meeting;
+package com.mogu.apiserver.domain.circle;
 
 import com.mogu.apiserver.domain.user.User;
 import jakarta.persistence.*;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserMeeting {
+public class UserCircle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +18,6 @@ public class UserMeeting {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Meeting meeting;
+    private Circle circle;
 
 }

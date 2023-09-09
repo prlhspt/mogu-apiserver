@@ -1,4 +1,4 @@
-package com.mogu.apiserver.domain.user.exception;
+package com.mogu.apiserver.domain.authentication.exception;
 
 import com.mogu.apiserver.global.error.ErrorObject;
 import lombok.Getter;
@@ -7,11 +7,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserErrorCode implements ErrorObject {
+public enum AuthenticationErrorCode implements ErrorObject {
 
-    ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
-    INACTIVATE_USER(HttpStatus.UNAUTHORIZED, "비활성화된 유저입니다.");
 
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레쉬 토큰입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
