@@ -45,9 +45,18 @@ public class AuthenticationController {
     })
     @PostMapping("/authentication/login")
     public ApiResponseEntity<AccountLoginResponse> authenticate(@Valid @RequestBody AccountLoginRequest request) {
-        return ApiResponseEntity.ok(authenticationService.login(request.toServiceRequest()));
+        AccountLoginResponse accountLoginResponse = authenticationService.login(request.toServiceRequest());
+        return ApiResponseEntity.ok(accountLoginResponse);
     }
 
+    @Operation(summary = "토큰 재발급")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+            @ApiResponse(responseCode = "403", description = "토큰 재발급 실패",
+                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
+    })
     @PutMapping("/authentication/refresh")
     public ApiResponseEntity<RefreshTokenResponse> refresh(@RequestHeader("Authorization") String token) {
         return ApiResponseEntity.ok(authenticationService.refresh(token.substring(7)));
