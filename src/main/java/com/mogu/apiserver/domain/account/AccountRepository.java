@@ -1,4 +1,4 @@
-package com.mogu.apiserver.infrastructure.account;
+package com.mogu.apiserver.domain.account;
 
 import com.mogu.apiserver.domain.account.Account;
 

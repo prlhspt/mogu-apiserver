@@ -1,4 +1,4 @@
-package com.mogu.apiserver.domain.settlement;
+package com.mogu.apiserver.domain.settlement.enums;
 
 import lombok.RequiredArgsConstructor;
 
@@ -8,6 +8,6 @@ public enum SettlementType {
     PERCENT("퍼센트"),
     SPECIFIC_PRICE("특정금액");
 
-    private final String text;
+    private final String description;
 
 }

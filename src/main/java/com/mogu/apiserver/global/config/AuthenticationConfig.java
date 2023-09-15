@@ -2,8 +2,9 @@ package com.mogu.apiserver.global.config;
 
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.AccountPrincipal;
+import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
-import com.mogu.apiserver.infrastructure.account.AccountRepository;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,7 @@ public class AuthenticationConfig {
     public UserDetailsService userDetailsService() {
         return username -> {
             Account account = accountRepository.findByEmailWithUser(username)
-                    .orElseThrow(InactivateUserException::new);
+                    .orElseThrow(AccountNotFoundException::new);
 
             return new AccountPrincipal(account.getEmail(), account.getPassword(), account.getUser().getType());
         };

@@ -13,7 +13,7 @@ import com.mogu.apiserver.domain.user.enums.UserType;
 import com.mogu.apiserver.domain.user.exception.AlreadyExistEmailException;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.infrastructure.account.AccountJpaRepository;
-import com.mogu.apiserver.infrastructure.account.AccountRepository;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import com.mogu.apiserver.infrastructure.user.UserRepository;
 import com.mogu.apiserver.presentation.authentication.response.AccountLoginResponse;
 import com.mogu.apiserver.presentation.authentication.response.RefreshTokenResponse;

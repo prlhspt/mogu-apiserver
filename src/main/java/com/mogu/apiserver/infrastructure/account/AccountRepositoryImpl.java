@@ -1,6 +1,7 @@
 package com.mogu.apiserver.infrastructure.account;
 
 import com.mogu.apiserver.domain.account.Account;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

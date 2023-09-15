@@ -1,6 +1,7 @@
 package com.mogu.apiserver.infrastructure.account;
 
 import com.mogu.apiserver.domain.account.Account;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;

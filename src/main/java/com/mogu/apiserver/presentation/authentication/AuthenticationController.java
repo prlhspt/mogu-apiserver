@@ -17,10 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+
+    public AuthenticationController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
 
     @Operation(summary = "회원가입")
     @ApiResponses(value = {
@@ -45,8 +48,7 @@ public class AuthenticationController {
     })
     @PostMapping("/authentication/login")
     public ApiResponseEntity<AccountLoginResponse> authenticate(@Valid @RequestBody AccountLoginRequest request) {
-        AccountLoginResponse accountLoginResponse = authenticationService.login(request.toServiceRequest());
-        return ApiResponseEntity.ok(accountLoginResponse);
+        return ApiResponseEntity.ok(authenticationService.login(request.toServiceRequest()));
     }
 
     @Operation(summary = "토큰 재발급")

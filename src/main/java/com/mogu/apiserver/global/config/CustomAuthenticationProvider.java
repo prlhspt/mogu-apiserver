@@ -3,7 +3,7 @@ package com.mogu.apiserver.global.config;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
-import com.mogu.apiserver.infrastructure.account.AccountRepository;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
