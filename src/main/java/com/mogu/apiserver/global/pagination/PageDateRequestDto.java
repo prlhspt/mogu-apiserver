@@ -1,10 +1,12 @@
 package com.mogu.apiserver.global.pagination;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.OffsetDateTime;
 
 @Getter
+@AllArgsConstructor
 public class PageDateRequestDto {
     private Long page;
     private Long limit;

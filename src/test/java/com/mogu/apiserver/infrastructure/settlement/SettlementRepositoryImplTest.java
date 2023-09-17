@@ -7,10 +7,7 @@ import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
 import com.mogu.apiserver.global.pagination.PageDateQuery;
-import com.mogu.apiserver.global.pagination.PageQuery;
-import com.mogu.apiserver.global.pagination.PageRequestDto;
-import com.mogu.apiserver.infrastructure.user.UserRepository;
-import org.assertj.core.groups.Tuple;
+import com.mogu.apiserver.infrastructure.user.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.groups.Tuple.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.groups.Tuple.tuple;
 
 @SpringBootTest
 @Transactional
@@ -34,7 +30,7 @@ class SettlementRepositoryImplTest {
     private SettlementJpaRepository settlementJpaRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Test
     @DisplayName("정산내역을 조회한다.")
@@ -60,7 +56,7 @@ class SettlementRepositoryImplTest {
                 .limit(5L)
                 .build();
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         settlementJpaRepository.save(settlement);
         settlementJpaRepository.save(settlement2);
 

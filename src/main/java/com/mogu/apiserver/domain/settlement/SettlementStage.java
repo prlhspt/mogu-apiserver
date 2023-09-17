@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,17 +26,26 @@ public class SettlementStage {
     @NotNull
     private Settlement settlement;
 
+    @OneToMany(mappedBy = "settlementStage", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SettlementParticipant> settlementParticipants = new ArrayList<>();
+
     @Builder
     private SettlementStage(Integer level) {
         this.level = level;
     }
 
     public static SettlementStage create(Integer level) {
-        return new SettlementStage(level);
+        SettlementStage settlementStage = new SettlementStage(level);
+
+        return settlementStage;
     }
 
     public void setSettlement(Settlement settlement) {
         this.settlement = settlement;
     }
 
+    public void addSettlementParticipant(SettlementParticipant settlementParticipant) {
+        settlementParticipants.add(settlementParticipant);
+        settlementParticipant.setSettlementStage(this);
+    }
 }

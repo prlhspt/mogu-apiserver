@@ -1,6 +1,5 @@
 package com.mogu.apiserver.application.settlement.request;
 
-import com.mogu.apiserver.domain.settlement.SettlementStage;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +18,6 @@ public class CreateSettlementServiceRequest {
 
     private Long totalPrice;
 
-    private List<String> imageURLs;
     private List<CreateSettlementServiceRequestStage> settlementStage;
 
     @Getter
@@ -37,17 +35,17 @@ public class CreateSettlementServiceRequest {
 
         String name;
         Long price;
+        Integer priority;
         SettlementType settlementType;
 
     }
 
-    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<String> imageURLs, List<CreateSettlementServiceRequestStage> settlementStage) {
+    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<CreateSettlementServiceRequestStage> settlementStage) {
         this.bankCode = bankCode;
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.message = message;
         this.totalPrice = totalPrice;
-        this.imageURLs = imageURLs;
         this.settlementStage = settlementStage;
     }
 

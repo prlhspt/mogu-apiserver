@@ -11,8 +11,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
-import static com.mogu.apiserver.domain.settlement.QSettlement.*;
+import static com.mogu.apiserver.domain.settlement.QSettlement.settlement;
+import static com.mogu.apiserver.domain.settlement.QSettlementStage.settlementStage;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,8 +29,6 @@ public class SettlementRepositoryImpl implements SettlementRepository {
                 .from(settlement)
                 .where(createdDateStart(pageDateQuery.getStartDate()),
                         createdDateEnd(pageDateQuery.getEndDate()))
-                .offset(pageDateQuery.getOffset())
-                .limit(pageDateQuery.getLimit())
                 .fetchOne();
 
         List<Settlement> result = jpaQueryFactory.selectFrom(settlement)
@@ -40,6 +40,16 @@ public class SettlementRepositoryImpl implements SettlementRepository {
 
         return PaginationResult.of(result, pageDateQuery.getLimit(), totalCount, pageDateQuery.hasNext(totalCount));
 
+    }
+
+    @Override
+    public Optional<Settlement> findSettlementById(Long settlementId) {
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(settlement)
+                        .where(settlement.id.eq(settlementId))
+                        .fetchOne()
+        );
     }
 
     private BooleanExpression createdDateStart(OffsetDateTime startDateTime) {

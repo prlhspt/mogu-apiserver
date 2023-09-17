@@ -10,7 +10,7 @@ import com.mogu.apiserver.domain.user.enums.UserType;
 import com.mogu.apiserver.domain.user.exception.AlreadyExistEmailException;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.infrastructure.account.AccountJpaRepository;
-import com.mogu.apiserver.infrastructure.user.UserRepository;
+import com.mogu.apiserver.infrastructure.user.UserJpaRepository;
 import com.mogu.apiserver.presentation.authentication.response.AccountLoginResponse;
 import com.mogu.apiserver.presentation.authentication.response.RegisterResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +34,7 @@ class AuthenticationServiceTest {
     private AccountJpaRepository accountJpaRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -90,7 +90,7 @@ class AuthenticationServiceTest {
 
         account.setUser(user);
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
         AccountLoginServiceRequest accountLoginServiceRequest = AccountLoginServiceRequest.builder()
@@ -124,7 +124,7 @@ class AuthenticationServiceTest {
 
         account.setUser(user);
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
         AccountLoginServiceRequest accountLoginServiceRequest = AccountLoginServiceRequest.builder()
@@ -155,7 +155,7 @@ class AuthenticationServiceTest {
 
         account.setUser(user);
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
         AccountLoginServiceRequest accountLoginServiceRequest = AccountLoginServiceRequest.builder()

@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum AccountErrorCode implements ErrorObject {
 
-    ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "계정을 찾을 수 없습니다.");
-
+    ACCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, "계정을 찾을 수 없습니다."),
+    NO_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

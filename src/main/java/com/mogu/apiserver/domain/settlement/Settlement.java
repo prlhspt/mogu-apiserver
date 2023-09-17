@@ -39,6 +39,9 @@ public class Settlement extends BaseEntity {
     @NotNull
     private User user;
 
+    @OneToMany(mappedBy = "settlement", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SettlementStage> settlementStages = new ArrayList<>();
+
     @Builder
     private Settlement(Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status) {
         this.totalPrice = totalPrice;
@@ -49,12 +52,20 @@ public class Settlement extends BaseEntity {
         this.status = status;
     }
 
-    public static Settlement create(Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status) {
-        return new Settlement(totalPrice, bankCode, accountNumber, accountName, message, status);
+    public static Settlement create(User user, Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status) {
+        Settlement settlement = new Settlement(totalPrice, bankCode, accountNumber, accountName, message, status);
+        settlement.setUser(user);
+
+        return settlement;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void addSettlementStage(SettlementStage settlementStage) {
+        settlementStages.add(settlementStage);
+        settlementStage.setSettlement(this);
     }
 
 }

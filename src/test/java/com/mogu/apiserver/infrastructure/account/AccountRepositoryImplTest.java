@@ -6,7 +6,7 @@ import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
-import com.mogu.apiserver.infrastructure.user.UserRepository;
+import com.mogu.apiserver.infrastructure.user.UserJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ class AccountRepositoryImplTest {
     private AccountJpaRepository accountJpaRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Test
     @DisplayName("이메일로 계정을 찾는다.")
@@ -45,7 +45,7 @@ class AccountRepositoryImplTest {
 
         account.setUser(user);
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
         Account result = accountRepository.findByEmailWithUser(account.getEmail())

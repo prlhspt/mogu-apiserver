@@ -1,5 +1,6 @@
 package com.mogu.apiserver.domain.account;
 
+import com.mogu.apiserver.domain.BaseEntity;
 import com.mogu.apiserver.domain.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 })
 @Getter
 @NoArgsConstructor
-public class Account {
+public class Account extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

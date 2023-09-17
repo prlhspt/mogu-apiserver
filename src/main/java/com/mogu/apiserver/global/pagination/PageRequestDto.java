@@ -1,6 +1,5 @@
 package com.mogu.apiserver.global.pagination;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 

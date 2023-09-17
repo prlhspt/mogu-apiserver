@@ -1,19 +1,27 @@
 package com.mogu.apiserver.application.settlement;
 
 import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest;
+import com.mogu.apiserver.domain.account.Account;
+import com.mogu.apiserver.domain.account.AccountRepository;
+import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import com.mogu.apiserver.domain.settlement.Settlement;
+import com.mogu.apiserver.domain.settlement.SettlementParticipant;
 import com.mogu.apiserver.domain.settlement.SettlementRepository;
 import com.mogu.apiserver.domain.settlement.SettlementStage;
+import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementStatus;
+import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
 import com.mogu.apiserver.global.pagination.PageDateQuery;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.infrastructure.settlement.SettlementJpaRepository;
+import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,13 +32,16 @@ public class SettlementService {
 
     private final SettlementJpaRepository settlementJpaRepository;
 
-    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery) {
-        return settlementRepository.findSettlements(pageDateQuery);
-    }
+    private final AccountRepository accountRepository;
 
-    public void createSettlement(CreateSettlementServiceRequest createSettlementServiceRequest) {
+    @Transactional
+    public CreateSettlementResponse createSettlement(CreateSettlementServiceRequest createSettlementServiceRequest, Long userId) {
+
+        Account account = accountRepository.findByIdWithUserFetch(userId)
+                .orElseThrow(() -> new AccountNotFoundException());
 
         Settlement settlement = Settlement.create(
+                account.getUser(),
                 createSettlementServiceRequest.getTotalPrice(),
                 createSettlementServiceRequest.getBankCode(),
                 createSettlementServiceRequest.getAccountNumber(),
@@ -39,23 +50,58 @@ public class SettlementService {
                 SettlementStatus.WAITING
         );
 
+        List<SettlementStage> settlementStages = createSettlementServiceRequest.getSettlementStage().stream()
+                .map(settlementStageRequest -> {
+                    SettlementStage stage = SettlementStage.create(settlementStageRequest.getLevel());
 
-        List<SettlementStage> collect = createSettlementServiceRequest.getSettlementStage().stream()
-                .map(settlementStage -> {
-                            SettlementStage stage = SettlementStage.create(settlementStage.getLevel());
-                            stage.setSettlement(settlement);
-                            return stage;
-                        }
-                .collect(Collectors.toList());
+                    List<SettlementParticipant> participants = settlementStageRequest.getParticipants().stream()
+                            .map(settlementParticipant -> SettlementParticipant.create(
+                                    settlementParticipant.getName(),
+                                    settlementParticipant.getSettlementType(),
+                                    settlementParticipant.getPrice(),
+                                    settlementParticipant.getPriority(),
+                                    SettlementParticipantStatus.WAITING)
+                            )
+                            .collect(toList());
 
-//        SettlementStage.builder()
-//                        .level()
-//                                .build();
+                    for (SettlementParticipant participant : participants) {
+                        stage.addSettlementParticipant(participant);
+                    }
 
-//        SettlementParticipant.builder()
-//                        .name(createSettlementServiceRequest.getSettlementStage())
+                    return stage;
+                }).collect(toList());
 
-        settlementJpaRepository.save(settlement);
+        for (SettlementStage settlementStage : settlementStages) {
+            settlement.addSettlementStage(settlementStage);
+        }
+
+        Settlement saveSettlement = settlementJpaRepository.save(settlement);
+
+        return CreateSettlementResponse.builder()
+                .settlementId(saveSettlement.getId())
+                .build();
+    }
+
+    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery) {
+        return settlementRepository.findSettlements(pageDateQuery);
+    }
+
+    public void findSettlement(Long settlementId, Long userId) {
+        Settlement settlement = settlementRepository.findSettlementById(settlementId)
+                .orElseThrow(() -> new SettlementNotFound());
+
+        List<SettlementStage> settlementStages = settlement.getSettlementStages();
+
+        for (SettlementStage settlementStage : settlementStages) {
+            List<SettlementParticipant> settlementParticipants = settlementStage.getSettlementParticipants();
+            for (SettlementParticipant settlementParticipant : settlementParticipants) {
+                System.out.println("settlementParticipant = " + settlementParticipant);
+            }
+        }
+
+
+
+        System.out.println("settlement = " + settlement);
 
     }
 

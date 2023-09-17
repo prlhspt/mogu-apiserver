@@ -1,5 +1,6 @@
 package com.mogu.apiserver.domain.user;
 
+import com.mogu.apiserver.domain.BaseEntity;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 })
 @Getter
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

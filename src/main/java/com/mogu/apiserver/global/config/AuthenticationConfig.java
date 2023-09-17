@@ -2,9 +2,8 @@ package com.mogu.apiserver.global.config;
 
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.AccountPrincipal;
-import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
-import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.domain.account.AccountRepository;
+import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

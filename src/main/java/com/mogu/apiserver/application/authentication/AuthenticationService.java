@@ -4,7 +4,9 @@ import com.mogu.apiserver.application.authentication.request.AccountLoginService
 import com.mogu.apiserver.application.authentication.request.RegisterServiceRequest;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.AccountPrincipal;
+import com.mogu.apiserver.domain.account.AccountRepository;
 import com.mogu.apiserver.domain.account.exception.AccountNotFoundException;
+import com.mogu.apiserver.domain.account.exception.NoPermissionException;
 import com.mogu.apiserver.domain.authentication.JwtTokenProvider;
 import com.mogu.apiserver.domain.authentication.exception.InvalidRefreshTokenException;
 import com.mogu.apiserver.domain.user.User;
@@ -12,9 +14,9 @@ import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
 import com.mogu.apiserver.domain.user.exception.AlreadyExistEmailException;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
+import com.mogu.apiserver.global.authentication.AuthenticationHelper;
 import com.mogu.apiserver.infrastructure.account.AccountJpaRepository;
-import com.mogu.apiserver.domain.account.AccountRepository;
-import com.mogu.apiserver.infrastructure.user.UserRepository;
+import com.mogu.apiserver.infrastructure.user.UserJpaRepository;
 import com.mogu.apiserver.presentation.authentication.response.AccountLoginResponse;
 import com.mogu.apiserver.presentation.authentication.response.RefreshTokenResponse;
 import com.mogu.apiserver.presentation.authentication.response.RegisterResponse;
@@ -33,7 +35,7 @@ public class AuthenticationService {
     private final AccountJpaRepository accountJpaRepository;
     private final AccountRepository accountRepository;
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -60,7 +62,7 @@ public class AuthenticationService {
 
         account.setUser(user);
 
-        userRepository.save(user);
+        userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
         AccountPrincipal accountPrincipal = AccountPrincipal.builder()
@@ -137,6 +139,18 @@ public class AuthenticationService {
         return RefreshTokenResponse.builder()
                 .accessToken(accessToken)
                 .build();
+
+    }
+
+    public void verifyIdentity(Long userId) {
+        String email = AuthenticationHelper.getEmail();
+
+        String findUserEmail = accountRepository.findByIdAndActiveUser(userId)
+                .orElseThrow(() -> new NoPermissionException());
+
+        if (!email.equals(findUserEmail)) {
+            throw new NoPermissionException();
+        }
 
     }
 

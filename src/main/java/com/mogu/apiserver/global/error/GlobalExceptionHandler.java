@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
                 ApiResponseEntity.of(
                         HttpStatus.BAD_REQUEST,
                         e.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                        null,
                         null
                 ), HttpStatus.BAD_REQUEST);
     }
@@ -29,6 +30,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 ApiResponseEntity.of(e.getErrorObject().getHttpStatus()
                         , e.getErrorObject().getMessage(),
+                        null,
                         null
                 ), e.getErrorObject().getHttpStatus());
     }
