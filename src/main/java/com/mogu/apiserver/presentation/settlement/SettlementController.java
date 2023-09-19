@@ -5,17 +5,14 @@ import com.mogu.apiserver.application.settlement.SettlementService;
 import com.mogu.apiserver.domain.settlement.Settlement;
 import com.mogu.apiserver.global.pagination.PageDateRequestDto;
 import com.mogu.apiserver.global.pagination.PaginationResult;
-import com.mogu.apiserver.global.pagination.PaginationResultResponse;
 import com.mogu.apiserver.global.util.ApiResponseEntity;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
+import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementsResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,37 +34,28 @@ public class SettlementController {
     }
 
     @GetMapping("/settlements/users/{userId}")
-    public ApiResponseEntity<List<FindSettlementsResponse>> findSettlements(
+    public ApiResponseEntity<FindSettlementsResponse> findSettlements(
             @PathVariable Long userId,
             @ModelAttribute @Valid PageDateRequestDto pageDateRequestDto
     ) {
 
         authenticationService.verifyIdentity(userId);
 
-        PaginationResult<Settlement> paginationResult = settlementService.findSettlements(pageDateRequestDto.toPageDateQuery());
+        PaginationResult<Settlement> settlements = settlementService.findSettlements(pageDateRequestDto.toPageDateQuery());
+        FindSettlementsResponse findSettlementsResponse = FindSettlementsResponse.of(settlements);
 
-        List<FindSettlementsResponse> findSettlementsResponses = paginationResult.getData().stream()
-                .map(settlement -> FindSettlementsResponse.builder()
-                        .totalPrice(settlement.getTotalPrice())
-                        .status(settlement.getStatus())
-                        .date(settlement.getCreatedDate())
-                        .build())
-                .collect(Collectors.toList());
-
-        PaginationResultResponse paginationResultResponse = PaginationResultResponse.of(paginationResult);
-
-        return ApiResponseEntity.ok(findSettlementsResponses, paginationResultResponse);
+        return ApiResponseEntity.ok(findSettlementsResponse);
 
     }
 
     @GetMapping("/settlements/{settlementId}/users/{userId}")
-    public void findSettlement(
+    public ApiResponseEntity<FindSettlementResponse> findSettlement(
             @PathVariable Long settlementId,
             @PathVariable Long userId
     ) {
 
         authenticationService.verifyIdentity(userId);
-        settlementService.findSettlement(settlementId, userId);
+        return ApiResponseEntity.ok(settlementService.findSettlement(settlementId, userId));
 
     }
 }

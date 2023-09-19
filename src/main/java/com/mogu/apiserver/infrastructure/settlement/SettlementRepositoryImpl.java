@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mogu.apiserver.domain.settlement.QSettlement.settlement;
-import static com.mogu.apiserver.domain.settlement.QSettlementStage.settlementStage;
 
 @Repository
 @RequiredArgsConstructor

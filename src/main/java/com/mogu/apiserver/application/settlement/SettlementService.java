@@ -15,6 +15,7 @@ import com.mogu.apiserver.global.pagination.PageDateQuery;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.infrastructure.settlement.SettlementJpaRepository;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
+import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,22 +87,11 @@ public class SettlementService {
         return settlementRepository.findSettlements(pageDateQuery);
     }
 
-    public void findSettlement(Long settlementId, Long userId) {
+    public FindSettlementResponse findSettlement(Long settlementId, Long userId) {
         Settlement settlement = settlementRepository.findSettlementById(settlementId)
                 .orElseThrow(() -> new SettlementNotFound());
 
-        List<SettlementStage> settlementStages = settlement.getSettlementStages();
-
-        for (SettlementStage settlementStage : settlementStages) {
-            List<SettlementParticipant> settlementParticipants = settlementStage.getSettlementParticipants();
-            for (SettlementParticipant settlementParticipant : settlementParticipants) {
-                System.out.println("settlementParticipant = " + settlementParticipant);
-            }
-        }
-
-
-
-        System.out.println("settlement = " + settlement);
+        return FindSettlementResponse.of(settlement);
 
     }
 
