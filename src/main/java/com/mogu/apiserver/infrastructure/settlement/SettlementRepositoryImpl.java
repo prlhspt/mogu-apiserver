@@ -22,16 +22,18 @@ public class SettlementRepositoryImpl implements SettlementRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery) {
+    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery, Long userId) {
         
         Long totalCount = jpaQueryFactory.select(settlement.count())
                 .from(settlement)
-                .where(createdDateStart(pageDateQuery.getStartDate()),
+                .where(settlement.user.id.eq(userId),
+                        createdDateStart(pageDateQuery.getStartDate()),
                         createdDateEnd(pageDateQuery.getEndDate()))
                 .fetchOne();
 
         List<Settlement> result = jpaQueryFactory.selectFrom(settlement)
-                .where(createdDateStart(pageDateQuery.getStartDate()),
+                .where(settlement.user.id.eq(userId),
+                        createdDateStart(pageDateQuery.getStartDate()),
                         createdDateEnd(pageDateQuery.getEndDate()))
                 .offset(pageDateQuery.getOffset())
                 .limit(pageDateQuery.getLimit())
@@ -42,11 +44,12 @@ public class SettlementRepositoryImpl implements SettlementRepository {
     }
 
     @Override
-    public Optional<Settlement> findSettlementById(Long settlementId) {
+    public Optional<Settlement> findSettlementById(Long settlementId, Long userId) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(settlement)
-                        .where(settlement.id.eq(settlementId))
+                        .where(settlement.id.eq(settlementId),
+                                settlement.user.id.eq(userId))
                         .fetchOne()
         );
     }

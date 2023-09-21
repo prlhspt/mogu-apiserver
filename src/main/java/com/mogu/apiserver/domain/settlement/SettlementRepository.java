@@ -7,8 +7,8 @@ import java.util.Optional;
 
 public interface SettlementRepository {
 
-    PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery);
+    PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery, Long userId);
 
-    Optional<Settlement> findSettlementById(Long settlementId);
+    Optional<Settlement> findSettlementById(Long settlementId, Long userId);
 
 }

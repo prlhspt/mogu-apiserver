@@ -37,7 +37,7 @@ class AuthenticationServiceTest {
     private UserJpaRepository userJpaRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("회원가입으로 계정을 생성한다.")

@@ -41,7 +41,7 @@ public class SettlementController {
 
         authenticationService.verifyIdentity(userId);
 
-        PaginationResult<Settlement> settlements = settlementService.findSettlements(pageDateRequestDto.toPageDateQuery());
+        PaginationResult<Settlement> settlements = settlementService.findSettlements(pageDateRequestDto.toPageDateQuery(), userId);
         FindSettlementsResponse findSettlementsResponse = FindSettlementsResponse.of(settlements);
 
         return ApiResponseEntity.ok(findSettlementsResponse);

@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class SettlementService {
     public CreateSettlementResponse createSettlement(CreateSettlementServiceRequest createSettlementServiceRequest, Long userId) {
 
         Account account = accountRepository.findByIdWithUserFetch(userId)
-                .orElseThrow(() -> new AccountNotFoundException());
+                .orElseThrow(AccountNotFoundException::new);
 
         Settlement settlement = Settlement.create(
                 account.getUser(),
@@ -63,14 +61,15 @@ public class SettlementService {
                                     settlementParticipant.getPriority(),
                                     SettlementParticipantStatus.WAITING)
                             )
-                            .collect(toList());
+                            .toList();
 
                     for (SettlementParticipant participant : participants) {
                         stage.addSettlementParticipant(participant);
                     }
 
                     return stage;
-                }).collect(toList());
+                })
+                .toList();
 
         for (SettlementStage settlementStage : settlementStages) {
             settlement.addSettlementStage(settlementStage);
@@ -83,13 +82,13 @@ public class SettlementService {
                 .build();
     }
 
-    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery) {
-        return settlementRepository.findSettlements(pageDateQuery);
+    public PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery, Long userId) {
+        return settlementRepository.findSettlements(pageDateQuery, userId);
     }
 
     public FindSettlementResponse findSettlement(Long settlementId, Long userId) {
-        Settlement settlement = settlementRepository.findSettlementById(settlementId)
-                .orElseThrow(() -> new SettlementNotFound());
+        Settlement settlement = settlementRepository.findSettlementById(settlementId, userId)
+                .orElseThrow(SettlementNotFound::new);
 
         return FindSettlementResponse.of(settlement);
 
