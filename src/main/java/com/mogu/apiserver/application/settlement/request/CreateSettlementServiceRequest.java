@@ -18,20 +18,20 @@ public class CreateSettlementServiceRequest {
 
     private Long totalPrice;
 
-    private List<CreateSettlementServiceRequestStage> settlementStage;
+    private List<CreateSettlementStagesServiceRequest> settlementStage;
 
     @Getter
     @Builder
-    public static class CreateSettlementServiceRequestStage {
+    public static class CreateSettlementStagesServiceRequest {
 
         Integer level;
-        List<CreateSettlementServiceRequestParticipants> participants;
+        List<CreateSettlementParticipantsServiceRequest> participants;
 
     }
 
     @Getter
     @Builder
-    public static class CreateSettlementServiceRequestParticipants {
+    public static class CreateSettlementParticipantsServiceRequest {
 
         String name;
         Long price;
@@ -40,7 +40,7 @@ public class CreateSettlementServiceRequest {
 
     }
 
-    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<CreateSettlementServiceRequestStage> settlementStage) {
+    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<CreateSettlementStagesServiceRequest> settlementStage) {
         this.bankCode = bankCode;
         this.accountName = accountName;
         this.accountNumber = accountNumber;

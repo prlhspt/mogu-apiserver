@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -47,5 +48,9 @@ public class SettlementStage {
     public void addSettlementParticipant(SettlementParticipant settlementParticipant) {
         settlementParticipants.add(settlementParticipant);
         settlementParticipant.setSettlementStage(this);
+    }
+
+    public void updateNotNullValue(Integer level) {
+        Optional.ofNullable(level).ifPresent(value -> this.level = value);
     }
 }

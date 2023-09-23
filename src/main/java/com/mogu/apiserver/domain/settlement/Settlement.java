@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -66,6 +67,14 @@ public class Settlement extends BaseEntity {
     public void addSettlementStage(SettlementStage settlementStage) {
         settlementStages.add(settlementStage);
         settlementStage.setSettlement(this);
+    }
+
+    public void updateNotNullValue(String bankCode, String accountNumber, String accountName, String message, Long totalPrice) {
+        Optional.ofNullable(bankCode).ifPresent(value -> this.bankCode = value);
+        Optional.ofNullable(accountNumber).ifPresent(value -> this.accountNumber = value);
+        Optional.ofNullable(accountName).ifPresent(value -> this.accountName = value);
+        Optional.ofNullable(message).ifPresent(value -> this.message = value);
+        Optional.ofNullable(totalPrice).ifPresent(value -> this.totalPrice = value);
     }
 
 }

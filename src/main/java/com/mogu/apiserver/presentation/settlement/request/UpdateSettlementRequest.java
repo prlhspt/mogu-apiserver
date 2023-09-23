@@ -1,8 +1,9 @@
 package com.mogu.apiserver.presentation.settlement.request;
 
-import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest;
-import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest.CreateSettlementParticipantsServiceRequest;
-import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest.CreateSettlementStagesServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementParticipantsServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementStageRequestService;
+import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -15,7 +16,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @Builder
-public class CreateSettlementRequest {
+public class UpdateSettlementRequest {
+
     @Schema(description = "은행 코드", example = "004")
     private String bankCode;
 
@@ -25,74 +27,75 @@ public class CreateSettlementRequest {
     @Schema(description = "계좌 번호", example = "123456789")
     private String accountNumber;
 
-    @NotNull(message = "메세지는 필수입니다.")
     @Schema(description = "메세지", example = "정산 요청합니다.")
     private String message;
 
-    @NotNull(message = "총 금액은 필수입니다.")
     @Schema(description = "총 금액", example = "10000")
     private Long totalPrice;
 
     @Schema(description = "정산 요청자의 ID", example = "1")
     private Long userId;
 
-    @Valid
-    @NotNull(message = "정산 단계는 필수입니다.")
     @Schema(description = "정산 단계")
-    private List<CreateSettlementStagesRequest> settlementStage;
+    private List<UpdateSettlementStagesRequest> settlementStage;
 
     @Getter
     @Builder
-    public static class CreateSettlementStagesRequest {
+    public static class UpdateSettlementStagesRequest {
 
-        @NotNull(message = "정산 단계 레벨은 필수입니다.")
         @Schema(description = "정산 단계 레벨", example = "1")
-        Integer level;
+        private Long id;
 
-        @Valid
-        @NotNull(message = "정산 참여자는 필수입니다.")
+        @Schema(description = "정산 단계 레벨", example = "1")
+        private Integer level;
+
         @Schema(description = "정산 참여자")
-        List<CreateSettlementParticipantsRequest> participants;
+        private List<UpdateSettlementParticipantsRequest> participants;
 
     }
 
     @Getter
     @Builder
-    public static class CreateSettlementParticipantsRequest {
+    public static class UpdateSettlementParticipantsRequest {
 
-        @NotNull(message = "정산 참여자의 이름은 필수입니다.")
+        @Schema(description = "정산 참여자의 id", example = "1")
+        private Long id;
+
         @Schema(description = "정산 참여자의 이름", example = "홍길동")
-        String name;
+        private String name;
 
-        @NotNull(message = "정산 참여자의 금액은 필수입니다.")
         @Schema(description = "정산 참여자의 금액", example = "10000")
-        Long price;
+        private Long price;
 
-        @NotNull(message = "정산 참여자 순서는 필수입니다.")
         @Schema(description = "정산 참여자 순서", example = "1")
-        Integer priority;
+        private Integer priority;
 
-        @NotNull(message = "정산 참여자의 타입은 필수입니다.")
         @Schema(description = "정산 참여자의 타입", example = "DUTCH_PAY")
-        SettlementType settlementType;
+        private SettlementType settlementType;
+
+        @Schema(description = "정산 참여자의 상태", example = "WAITING")
+        private SettlementParticipantStatus settlementParticipantStatus;
     }
 
-    public CreateSettlementServiceRequest toServiceRequest() {
-        List<CreateSettlementStagesServiceRequest> settlementServiceRequestStages = settlementStage.stream()
-                .map(settlementStage -> CreateSettlementStagesServiceRequest.builder()
+    public UpdateSettlementServiceRequest toServiceRequest() {
+        List<UpdateSettlementStageRequestService> settlementServiceRequestStages = settlementStage.stream()
+                .map(settlementStage -> UpdateSettlementStageRequestService.builder()
+                        .id(settlementStage.getId())
                         .level(settlementStage.getLevel())
                         .participants(settlementStage.getParticipants().stream()
-                                .map(participants -> CreateSettlementParticipantsServiceRequest.builder()
+                                .map(participants -> UpdateSettlementParticipantsServiceRequest.builder()
+                                        .id(participants.getId())
                                         .name(participants.getName())
                                         .price(participants.getPrice())
                                         .priority(participants.getPriority())
                                         .settlementType(participants.getSettlementType())
+                                        .settlementParticipantStatus(participants.getSettlementParticipantStatus())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())
                 .collect(Collectors.toList());
 
-        return CreateSettlementServiceRequest.builder()
+        return UpdateSettlementServiceRequest.builder()
                 .bankCode(bankCode)
                 .accountName(accountName)
                 .accountNumber(accountNumber)
@@ -103,4 +106,3 @@ public class CreateSettlementRequest {
 
     }
 }
-

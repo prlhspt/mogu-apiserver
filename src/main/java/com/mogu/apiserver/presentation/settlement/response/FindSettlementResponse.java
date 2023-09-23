@@ -42,12 +42,14 @@ public class FindSettlementResponse {
     @Getter
     @Builder
     public static class FindSettlementStageResponse {
+        private Long id;
         private Integer level;
         private List<FindSettlementParticipantResponse> participants;
 
         public static List<FindSettlementStageResponse> of(List<SettlementStage> settlementStages) {
             return settlementStages.stream()
                     .map(settlementStage -> FindSettlementStageResponse.builder()
+                            .id(settlementStage.getId())
                             .level(settlementStage.getLevel())
                             .participants(FindSettlementParticipantResponse.of(settlementStage.getSettlementParticipants()))
                             .build())
@@ -59,6 +61,7 @@ public class FindSettlementResponse {
     @Getter
     @Builder
     public static class FindSettlementParticipantResponse {
+        private Long id;
         private String name;
         private Long price;
         private Integer priority;
@@ -68,6 +71,7 @@ public class FindSettlementResponse {
         public static List<FindSettlementParticipantResponse> of(List<SettlementParticipant> participants) {
             return participants.stream()
                     .map(participant -> FindSettlementParticipantResponse.builder()
+                            .id(participant.getId())
                             .name(participant.getName())
                             .price(participant.getPrice())
                             .priority(participant.getPriority())

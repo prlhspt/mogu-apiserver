@@ -7,9 +7,11 @@ import com.mogu.apiserver.global.pagination.PageDateRequestDto;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.global.util.ApiResponseEntity;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest;
+import com.mogu.apiserver.presentation.settlement.request.UpdateSettlementRequest;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementsResponse;
+import com.mogu.apiserver.presentation.settlement.response.UpdateSettlementResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -56,6 +58,18 @@ public class SettlementController {
 
         authenticationService.verifyIdentity(userId);
         return ApiResponseEntity.ok(settlementService.findSettlement(settlementId, userId));
+
+    }
+
+    @PatchMapping("/settlements/{settlementId}/users/{userId}")
+    public ApiResponseEntity<UpdateSettlementResponse> updateSettlement(
+            @PathVariable Long settlementId,
+            @PathVariable Long userId,
+            @RequestBody UpdateSettlementRequest updateSettlementRequest
+    ) {
+
+        authenticationService.verifyIdentity(userId);
+        return ApiResponseEntity.ok(settlementService.updateSettlement(updateSettlementRequest.toServiceRequest(), settlementId, userId));
 
     }
 }

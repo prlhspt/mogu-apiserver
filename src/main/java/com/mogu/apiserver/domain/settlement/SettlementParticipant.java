@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,6 +36,7 @@ public class SettlementParticipant extends BaseEntity {
     @NotNull
     private Integer priority;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
     private SettlementParticipantStatus settlementParticipantStatus;
 
@@ -59,6 +62,14 @@ public class SettlementParticipant extends BaseEntity {
 
     public void setSettlementStage(SettlementStage settlementStage) {
         this.settlementStage = settlementStage;
+    }
+
+    public void updateNotNullValue(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus) {
+        Optional.ofNullable(name).ifPresent(value -> this.name = value);
+        Optional.ofNullable(settlementType).ifPresent(value -> this.settlementType = value);
+        Optional.ofNullable(price).ifPresent(value -> this.price = value);
+        Optional.ofNullable(priority).ifPresent(value -> this.priority = value);
+        Optional.ofNullable(settlementParticipantStatus).ifPresent(value -> this.settlementParticipantStatus = value);
     }
 
 }

@@ -1,6 +1,9 @@
 package com.mogu.apiserver.application.settlement;
 
 import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementParticipantsServiceRequest;
+import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementStageRequestService;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.settlement.Settlement;
 import com.mogu.apiserver.domain.settlement.SettlementParticipant;
@@ -8,6 +11,7 @@ import com.mogu.apiserver.domain.settlement.SettlementStage;
 import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
+import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
 import com.mogu.apiserver.domain.user.enums.UserType;
@@ -27,8 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -77,11 +80,11 @@ class SettlementServiceTest {
                 .totalPrice(10000L)
                 .settlementStage(
                         List.of(
-                                CreateSettlementServiceRequest.CreateSettlementServiceRequestStage.builder()
+                                CreateSettlementServiceRequest.CreateSettlementStagesServiceRequest.builder()
                                         .level(1)
                                         .participants(
                                                 List.of(
-                                                        CreateSettlementServiceRequest.CreateSettlementServiceRequestParticipants.builder()
+                                                        CreateSettlementServiceRequest.CreateSettlementParticipantsServiceRequest.builder()
                                                                 .name("홍길동")
                                                                 .settlementType(SettlementType.DUTCH_PAY)
                                                                 .price(10000L)
@@ -210,7 +213,7 @@ class SettlementServiceTest {
         settlement.setUser(user);
         settlementJpaRepository.save(settlement);
 
-        FindSettlementResponse findSettlementResponse = settlementService.findSettlement(1L, user.getId());
+        FindSettlementResponse findSettlementResponse = settlementService.findSettlement(settlement.getId(), user.getId());
 
         assertThat(findSettlementResponse).isNotNull();
         assertThat(findSettlementResponse)
@@ -218,4 +221,185 @@ class SettlementServiceTest {
                 .contains("001", "홍길동", "123456789", "정산 요청합니다.", 10000L, user.getId());
 
     }
+
+    @Test
+    @DisplayName("정산을 id로 조회할 때, 해당 정산이 없으면 예외를 발생시킨다.")
+    void findSettlementWithException() {
+
+        Account account = Account.builder()
+                .email("test@test.com")
+                .password(passwordEncoder.encode("test123"))
+                .build();
+
+        User user = User.builder()
+                .nickname("test")
+                .status(UserStatus.ACTIVE)
+                .type(UserType.USER)
+                .build();
+
+        account.setUser(user);
+
+        userJpaRepository.save(user);
+        accountJpaRepository.save(account);
+
+        assertThatThrownBy(() -> settlementService.findSettlement(1L, user.getId()))
+                .isInstanceOf(SettlementNotFound.class)
+                .hasMessage("정산 내역을 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("정산을 id로 조회할 때, 해당 정산이 다른 유저의 것이면 예외를 발생시킨다.")
+    void findSettlementWithException2() {
+
+        Account account = Account.builder()
+                .email("test@test.com")
+                .password(passwordEncoder.encode("test123"))
+                .build();
+
+        User user = User.builder()
+                .nickname("test")
+                .status(UserStatus.ACTIVE)
+                .type(UserType.USER)
+                .build();
+
+        account.setUser(user);
+
+        userJpaRepository.save(user);
+        accountJpaRepository.save(account);
+
+        Account account2 = Account.builder()
+                .email("test2@test.com")
+                .password(passwordEncoder.encode("test123"))
+                .build();
+
+        User user2 = User.builder()
+                .nickname("test2")
+                .status(UserStatus.ACTIVE)
+                .type(UserType.USER)
+                .build();
+
+        account.setUser(user2);
+
+        userJpaRepository.save(user2);
+        accountJpaRepository.save(account2);
+
+        Settlement settlement = Settlement.builder()
+                .accountName("홍길동")
+                .accountNumber("123456789")
+                .bankCode("001")
+                .message("정산 요청합니다.")
+                .status(SettlementStatus.WAITING)
+                .totalPrice(10000L)
+                .build();
+
+        SettlementStage settlementStage = SettlementStage.builder()
+                .level(1)
+                .build();
+
+        SettlementParticipant settlementParticipant = SettlementParticipant.builder()
+                .name("홍길동")
+                .settlementType(SettlementType.DUTCH_PAY)
+                .price(10000L)
+                .priority(1)
+                .settlementParticipantStatus(SettlementParticipantStatus.WAITING)
+                .build();
+
+        settlementStage.addSettlementParticipant(settlementParticipant);
+        settlement.addSettlementStage(settlementStage);
+        settlement.setUser(user);
+        settlementJpaRepository.save(settlement);
+
+        assertThatThrownBy(() -> settlementService.findSettlement(settlement.getId(), user2.getId()))
+                .isInstanceOf(SettlementNotFound.class)
+                .hasMessage("정산 내역을 찾을 수 없습니다.");
+
+    }
+
+    @Test
+    @DisplayName("정산을 수정한다.")
+    void updateSettlement() {
+
+        Account account = Account.builder()
+                .email("test@test.com")
+                .password(passwordEncoder.encode("test123"))
+                .build();
+
+        User user = User.builder()
+                .nickname("test")
+                .status(UserStatus.ACTIVE)
+                .type(UserType.USER)
+                .build();
+
+        account.setUser(user);
+
+        Settlement settlement = Settlement.builder()
+                .accountName("홍길동")
+                .accountNumber("123456789")
+                .bankCode("001")
+                .message("정산 요청합니다.")
+                .status(SettlementStatus.WAITING)
+                .totalPrice(10000L)
+                .build();
+
+        SettlementStage settlementStage = SettlementStage.builder()
+                .level(1)
+                .build();
+
+        SettlementParticipant settlementParticipant = SettlementParticipant.builder()
+                .name("홍길동")
+                .settlementType(SettlementType.PERCENT)
+                .price(10000L)
+                .priority(1)
+                .settlementParticipantStatus(SettlementParticipantStatus.WAITING)
+                .build();
+
+        userJpaRepository.save(user);
+        accountJpaRepository.save(account);
+
+        settlementStage.addSettlementParticipant(settlementParticipant);
+        settlement.addSettlementStage(settlementStage);
+        settlement.setUser(user);
+        settlementJpaRepository.save(settlement);
+
+        UpdateSettlementServiceRequest request = UpdateSettlementServiceRequest.builder()
+                .bankCode("002")
+                .totalPrice(20000L)
+                .settlementStage(
+                        List.of(
+                                UpdateSettlementStageRequestService.builder()
+                                        .id(settlementStage.getId())
+                                        .level(2)
+                                        .participants(
+                                                List.of(
+                                                        UpdateSettlementParticipantsServiceRequest.builder()
+                                                                .id(settlementParticipant.getId())
+                                                                .price(20000L)
+                                                                .settlementParticipantStatus(SettlementParticipantStatus.DONE)
+                                                                .build()
+                                                )
+                                        )
+                                        .build()
+                        )
+                )
+                .build();
+
+        settlementService.updateSettlement(request, settlement.getId(), user.getId());
+
+        Settlement findSettlement = settlementJpaRepository.findById(settlement.getId())
+                .orElseThrow(SettlementNotFound::new);
+
+        assertThat(findSettlement).isNotNull();
+        assertThat(findSettlement)
+                .extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice")
+                .contains("002", "홍길동", "123456789", "정산 요청합니다.", 20000L);
+
+        assertThat(findSettlement.getSettlementStages().get(0).getLevel()).isEqualTo(2);
+
+        assertThat(findSettlement.getSettlementStages().get(0).getSettlementParticipants().get(0))
+                .extracting("name", "settlementType", "price", "priority", "settlementParticipantStatus")
+                .contains("홍길동", SettlementType.PERCENT, 20000L, 1, SettlementParticipantStatus.DONE);
+
+    }
+
 }

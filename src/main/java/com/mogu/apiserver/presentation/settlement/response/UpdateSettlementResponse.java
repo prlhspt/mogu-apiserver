@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CreateSettlementResponse {
+public class UpdateSettlementResponse {
 
     @Schema(description = "정산 ID", example = "1")
     private Long settlementId;
