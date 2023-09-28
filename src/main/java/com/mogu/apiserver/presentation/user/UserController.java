@@ -67,7 +67,7 @@ public class UserController {
     ) {
         authenticationService.verifyIdentity(userId);
 
-        return ApiResponseEntity.ok(userService.updateUser(userId, request));
+        return ApiResponseEntity.ok(userService.updateUser(userId, request.toServiceRequest()));
     }
 
     @Operation(summary = "회원 탈퇴")

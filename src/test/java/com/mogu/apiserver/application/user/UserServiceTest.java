@@ -1,5 +1,6 @@
 package com.mogu.apiserver.application.user;
 
+import com.mogu.apiserver.application.user.request.UpdateUserServiceRequest;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
@@ -150,7 +151,7 @@ class UserServiceTest {
 
         userJpaRepository.save(user);
 
-        UpdateUserRequest updateUserRequest = UpdateUserRequest.builder()
+        UpdateUserServiceRequest updateUserRequest = UpdateUserServiceRequest.builder()
                 .nickname("test2")
                 .build();
 

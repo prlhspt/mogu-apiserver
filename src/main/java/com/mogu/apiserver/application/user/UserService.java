@@ -1,5 +1,6 @@
 package com.mogu.apiserver.application.user;
 
+import com.mogu.apiserver.application.user.request.UpdateUserServiceRequest;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.account.AccountRepository;
 import com.mogu.apiserver.domain.user.User;
@@ -56,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
+    public UpdateUserResponse updateUser(Long userId, UpdateUserServiceRequest request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
