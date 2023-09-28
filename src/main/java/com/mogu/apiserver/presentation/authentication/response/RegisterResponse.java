@@ -7,6 +7,9 @@ import lombok.Getter;
 @Getter
 public class RegisterResponse {
 
+    @Schema(example = "1", description = "User ID")
+    private final Long userId;
+
     @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwiaWF0IjoxNjI5MjU0NjY4L", description = "JWT Access Token")
     private final String accessToken;
 
@@ -14,7 +17,8 @@ public class RegisterResponse {
     private final String refreshToken;
 
     @Builder
-    public RegisterResponse(String accessToken, String refreshToken) {
+    public RegisterResponse(Long userId, String accessToken, String refreshToken) {
+        this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }

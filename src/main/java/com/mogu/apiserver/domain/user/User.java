@@ -9,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Entity
 @Table(name = "users", uniqueConstraints = {
         @UniqueConstraint(name = "uc_user_nickname", columnNames = {"nickname"})
@@ -42,4 +44,14 @@ public class User extends BaseEntity {
     public boolean isActivated() {
         return this.status == UserStatus.ACTIVE;
     }
+
+    public void delete() {
+        this.status = UserStatus.INACTIVE;
+    }
+
+
+    public void updateNotNullValue(String nickname) {
+        Optional.ofNullable(nickname).ifPresent(value -> this.nickname = value);
+    }
+
 }

@@ -75,6 +75,7 @@ public class AuthenticationService {
         String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal, jwtTokenProvider.getRefreshTokenExpireTime());
 
         return RegisterResponse.builder()
+                .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -102,10 +103,12 @@ public class AuthenticationService {
                 .build();
 
 
+        Long id = account.getUser().getId();
         String accessToken = jwtTokenProvider.generateAccessToken(accountPrincipal, jwtTokenProvider.getAccessTokenExpireTime());
         String refreshToken = jwtTokenProvider.generateRefreshToken(accountPrincipal, jwtTokenProvider.getRefreshTokenExpireTime());
 
         return AccountLoginResponse.builder()
+                .userId(id)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

@@ -7,6 +7,9 @@ import lombok.Getter;
 @Getter
 public class AccountLoginResponse {
 
+    @Schema(example = "1", description = "User ID")
+    private Long userId;
+
     @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNjI5MjU0NjY2LCJ", description = "JWT Access Token")
     private final String accessToken;
 
@@ -14,9 +17,9 @@ public class AccountLoginResponse {
     private final String refreshToken;
 
     @Builder
-    public AccountLoginResponse(String accessToken, String refreshToken) {
+    public AccountLoginResponse(Long userId, String accessToken, String refreshToken) {
+        this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
-
 }

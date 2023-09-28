@@ -17,7 +17,7 @@ public class AccountLoginRequest {
     @Email(message = "이메일 형식이 올바르지 않습니다.")
     private String email;
 
-    @Schema(example = "test1234", description = "비밀번호")
+    @Schema(example = "test1234!", description = "비밀번호")
     @NotBlank(message = "비밀번호는 필수입니다.")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$")
     private String password;

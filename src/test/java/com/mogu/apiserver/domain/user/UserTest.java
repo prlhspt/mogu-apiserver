@@ -36,4 +36,18 @@ class UserTest {
 
         assertThat(activated).isFalse();
     }
+
+    @Test
+    @DisplayName("사용자의 닉네임을 변경한다.")
+    void updateNotNullValue() {
+        User user = User.builder()
+                .nickname("test")
+                .type(UserType.USER)
+                .status(UserStatus.ACTIVE)
+                .build();
+
+        user.updateNotNullValue("test2");
+
+        assertThat(user.getNickname()).isEqualTo("test2");
+    }
 }
