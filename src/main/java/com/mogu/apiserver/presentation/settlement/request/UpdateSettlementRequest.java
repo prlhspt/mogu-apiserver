@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -75,6 +76,9 @@ public class UpdateSettlementRequest {
 
         @Schema(description = "정산 참여자의 상태", example = "WAITING")
         private SettlementParticipantStatus settlementParticipantStatus;
+
+        @Schema(description = "정산 참여자 정산 비율", example = "15")
+        private Integer percentage;
     }
 
     public UpdateSettlementServiceRequest toServiceRequest() {
@@ -90,6 +94,7 @@ public class UpdateSettlementRequest {
                                         .priority(participants.getPriority())
                                         .settlementType(participants.getSettlementType())
                                         .settlementParticipantStatus(participants.getSettlementParticipantStatus())
+                                        .percentage(participants.getPercentage())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())

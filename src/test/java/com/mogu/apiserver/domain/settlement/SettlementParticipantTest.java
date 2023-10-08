@@ -16,20 +16,21 @@ class SettlementParticipantTest {
                 .name("name")
                 .price(1000L)
                 .priority(1)
-                .settlementType(SettlementType.PERCENT)
+                .settlementType(SettlementType.DUTCH_PAY)
                 .settlementParticipantStatus(SettlementParticipantStatus.WAITING)
                 .build();
 
         settlementParticipant.updateNotNullValue(
                 "changeName",
-                SettlementType.DUTCH_PAY,
+                SettlementType.PERCENT,
                 2000L,
                 2,
-                SettlementParticipantStatus.DONE
+                SettlementParticipantStatus.DONE,
+                15
         );
 
-        assertThat(settlementParticipant).extracting("name", "settlementType", "price", "priority", "settlementParticipantStatus")
-                .containsExactly("changeName", SettlementType.DUTCH_PAY, 2000L, 2, SettlementParticipantStatus.DONE);
+        assertThat(settlementParticipant).extracting("name", "settlementType", "price", "priority", "settlementParticipantStatus", "percentage")
+                .containsExactly("changeName", SettlementType.PERCENT, 2000L, 2, SettlementParticipantStatus.DONE, 15);
 
     }
 
@@ -45,6 +46,7 @@ class SettlementParticipantTest {
                 .build();
 
         settlementParticipant.updateNotNullValue(
+                null,
                 null,
                 null,
                 null,

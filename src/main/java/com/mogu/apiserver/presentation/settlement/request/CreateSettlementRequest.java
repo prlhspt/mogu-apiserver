@@ -75,6 +75,9 @@ public class CreateSettlementRequest {
         @NotNull(message = "정산 참여자의 타입은 필수입니다.")
         @Schema(description = "정산 참여자의 타입", example = "DUTCH_PAY")
         SettlementType settlementType;
+
+        @Schema(description = "정산 참여자 퍼센트 비율", example = "15")
+        Integer percentage;
     }
 
     public CreateSettlementServiceRequest toServiceRequest() {
@@ -87,6 +90,7 @@ public class CreateSettlementRequest {
                                         .price(participants.getPrice())
                                         .priority(participants.getPriority())
                                         .settlementType(participants.getSettlementType())
+                                        .percentage(participants.getPercentage())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())

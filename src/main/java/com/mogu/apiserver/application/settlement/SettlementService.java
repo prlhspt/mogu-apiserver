@@ -13,9 +13,8 @@ import com.mogu.apiserver.domain.settlement.SettlementRepository;
 import com.mogu.apiserver.domain.settlement.SettlementStage;
 import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementStatus;
-import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
-import com.mogu.apiserver.domain.settlement.exception.SettlementParticipantNotFound;
-import com.mogu.apiserver.domain.settlement.exception.SettlementStageNotFound;
+import com.mogu.apiserver.domain.settlement.enums.SettlementType;
+import com.mogu.apiserver.domain.settlement.exception.*;
 import com.mogu.apiserver.global.pagination.PageDateQuery;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.infrastructure.settlement.SettlementJpaRepository;
@@ -65,12 +64,21 @@ public class SettlementService {
                     SettlementStage stage = SettlementStage.create(settlementStageRequest.getLevel());
 
                     List<SettlementParticipant> participants = settlementStageRequest.getParticipants().stream()
-                            .map(settlementParticipant -> SettlementParticipant.create(
-                                    settlementParticipant.getName(),
-                                    settlementParticipant.getSettlementType(),
-                                    settlementParticipant.getPrice(),
-                                    settlementParticipant.getPriority(),
-                                    SettlementParticipantStatus.WAITING)
+                            .map(
+                                    settlementParticipantRequest -> {
+                                        if (settlementParticipantRequest.getSettlementType().equals(SettlementType.PERCENT) && settlementParticipantRequest.getPercentage() == null) {
+                                            throw new MissingPercentageException();
+                                        }
+
+                                        return SettlementParticipant.create(
+                                                settlementParticipantRequest.getName(),
+                                                settlementParticipantRequest.getSettlementType(),
+                                                settlementParticipantRequest.getPrice(),
+                                                settlementParticipantRequest.getPriority(),
+                                                SettlementParticipantStatus.WAITING,
+                                                settlementParticipantRequest.getPercentage()
+                                        );
+                                    }
                             )
                             .toList();
 
@@ -125,9 +133,17 @@ public class SettlementService {
                     .collect(toMap(SettlementParticipant::getId, Function.identity()));
 
             updateSettlementStageRequestService.getParticipants().forEach(updateSettlementParticipantsServiceRequest -> {
+                if (updateSettlementParticipantsServiceRequest.getSettlementType() == SettlementType.PERCENT && updateSettlementParticipantsServiceRequest.getPercentage() == null) {
+                    throw new MissingPercentageException();
+                }
+
+                if (updateSettlementParticipantsServiceRequest.getSettlementType() != SettlementType.PERCENT && updateSettlementParticipantsServiceRequest.getPercentage() != null) {
+                    throw new PercentageMismatchException();
+                }
+
                 SettlementParticipant settlementParticipant = Optional.ofNullable(participantMap.get(updateSettlementParticipantsServiceRequest.getId()))
                         .orElseThrow(SettlementParticipantNotFound::new);
-                settlementParticipant.updateNotNullValue(updateSettlementParticipantsServiceRequest.getName(), updateSettlementParticipantsServiceRequest.getSettlementType(), updateSettlementParticipantsServiceRequest.getPrice(), updateSettlementParticipantsServiceRequest.getPriority(), updateSettlementParticipantsServiceRequest.getSettlementParticipantStatus());
+                settlementParticipant.updateNotNullValue(updateSettlementParticipantsServiceRequest.getName(), updateSettlementParticipantsServiceRequest.getSettlementType(), updateSettlementParticipantsServiceRequest.getPrice(), updateSettlementParticipantsServiceRequest.getPriority(), updateSettlementParticipantsServiceRequest.getSettlementParticipantStatus(), updateSettlementParticipantsServiceRequest.getPercentage());
             });
         });
 

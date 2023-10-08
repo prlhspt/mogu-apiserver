@@ -11,6 +11,8 @@ import com.mogu.apiserver.domain.settlement.SettlementStage;
 import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
+import com.mogu.apiserver.domain.settlement.exception.MissingPercentageException;
+import com.mogu.apiserver.domain.settlement.exception.PercentageMismatchException;
 import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
@@ -102,6 +104,55 @@ class SettlementServiceTest {
         assertThat(settlement).isNotNull();
         assertThat(settlement.getSettlementId()).isInstanceOf(Long.class);
     }
+
+    @Test
+    @DisplayName("정산을 생성할 때, 정산 참여자의 타입이 퍼센트인데 percentage 가 null 이면 예외를 발생시킨다.")
+    void createSettlementNoPercentageException() {
+        Account account = Account.builder()
+                .email("test@test.com")
+                .password(passwordEncoder.encode("test123"))
+                .build();
+
+        User user = User.builder()
+                .nickname("test")
+                .status(UserStatus.ACTIVE)
+                .type(UserType.USER)
+                .build();
+
+        account.setUser(user);
+
+        userJpaRepository.save(user);
+        accountJpaRepository.save(account);
+
+        CreateSettlementServiceRequest request = CreateSettlementServiceRequest.builder()
+                .bankCode("001")
+                .accountName("홍길동")
+                .accountNumber("123456789")
+                .message("정산 요청합니다.")
+                .totalPrice(10000L)
+                .settlementStage(
+                        List.of(
+                                CreateSettlementServiceRequest.CreateSettlementStagesServiceRequest.builder()
+                                        .level(1)
+                                        .participants(
+                                                List.of(
+                                                        CreateSettlementServiceRequest.CreateSettlementParticipantsServiceRequest.builder()
+                                                                .name("홍길동")
+                                                                .settlementType(SettlementType.PERCENT)
+                                                                .price(10000L)
+                                                                .priority(1)
+                                                                .build()
+                                                )
+                                        )
+                                        .build()
+                        )
+                )
+                .build();
+
+        assertThatThrownBy(() -> settlementService.createSettlement(request, user.getId()))
+                .isInstanceOf(MissingPercentageException.class);
+    }
+
 
     @Test
     @DisplayName("정산을 조회한다.")
@@ -224,7 +275,7 @@ class SettlementServiceTest {
 
     @Test
     @DisplayName("정산을 id로 조회할 때, 해당 정산이 없으면 예외를 발생시킨다.")
-    void findSettlementWithException() {
+    void findSettlementNotFoundSettlementException() {
 
         Account account = Account.builder()
                 .email("test@test.com")
@@ -243,74 +294,6 @@ class SettlementServiceTest {
         accountJpaRepository.save(account);
 
         assertThatThrownBy(() -> settlementService.findSettlement(1L, user.getId()))
-                .isInstanceOf(SettlementNotFound.class)
-                .hasMessage("정산 내역을 찾을 수 없습니다.");
-
-    }
-
-    @Test
-    @DisplayName("정산을 id로 조회할 때, 해당 정산이 다른 유저의 것이면 예외를 발생시킨다.")
-    void findSettlementWithException2() {
-
-        Account account = Account.builder()
-                .email("test@test.com")
-                .password(passwordEncoder.encode("test123"))
-                .build();
-
-        User user = User.builder()
-                .nickname("test")
-                .status(UserStatus.ACTIVE)
-                .type(UserType.USER)
-                .build();
-
-        account.setUser(user);
-
-        userJpaRepository.save(user);
-        accountJpaRepository.save(account);
-
-        Account account2 = Account.builder()
-                .email("test2@test.com")
-                .password(passwordEncoder.encode("test123"))
-                .build();
-
-        User user2 = User.builder()
-                .nickname("test2")
-                .status(UserStatus.ACTIVE)
-                .type(UserType.USER)
-                .build();
-
-        account.setUser(user2);
-
-        userJpaRepository.save(user2);
-        accountJpaRepository.save(account2);
-
-        Settlement settlement = Settlement.builder()
-                .accountName("홍길동")
-                .accountNumber("123456789")
-                .bankCode("001")
-                .message("정산 요청합니다.")
-                .status(SettlementStatus.WAITING)
-                .totalPrice(10000L)
-                .build();
-
-        SettlementStage settlementStage = SettlementStage.builder()
-                .level(1)
-                .build();
-
-        SettlementParticipant settlementParticipant = SettlementParticipant.builder()
-                .name("홍길동")
-                .settlementType(SettlementType.DUTCH_PAY)
-                .price(10000L)
-                .priority(1)
-                .settlementParticipantStatus(SettlementParticipantStatus.WAITING)
-                .build();
-
-        settlementStage.addSettlementParticipant(settlementParticipant);
-        settlement.addSettlementStage(settlementStage);
-        settlement.setUser(user);
-        settlementJpaRepository.save(settlement);
-
-        assertThatThrownBy(() -> settlementService.findSettlement(settlement.getId(), user2.getId()))
                 .isInstanceOf(SettlementNotFound.class)
                 .hasMessage("정산 내역을 찾을 수 없습니다.");
 

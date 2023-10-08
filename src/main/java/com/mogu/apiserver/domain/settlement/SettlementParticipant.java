@@ -40,17 +40,20 @@ public class SettlementParticipant extends BaseEntity {
     @NotNull
     private SettlementParticipantStatus settlementParticipantStatus;
 
+    private Integer percentage;
+
     @Builder
-    private SettlementParticipant(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus) {
+    private SettlementParticipant(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus, Integer percentage) {
         this.name = name;
         this.settlementType = settlementType;
         this.price = price;
         this.priority = priority;
         this.settlementParticipantStatus = settlementParticipantStatus;
+        this.percentage = percentage;
     }
 
-    public static SettlementParticipant create(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus) {
-        return new SettlementParticipant(name, settlementType, price, priority, settlementParticipantStatus);
+    public static SettlementParticipant create(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus, Integer percentage) {
+        return new SettlementParticipant(name, settlementType, price, priority, settlementParticipantStatus, percentage);
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,12 +67,13 @@ public class SettlementParticipant extends BaseEntity {
         this.settlementStage = settlementStage;
     }
 
-    public void updateNotNullValue(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus) {
+    public void updateNotNullValue(String name, SettlementType settlementType, Long price, Integer priority, SettlementParticipantStatus settlementParticipantStatus, Integer percentage) {
         Optional.ofNullable(name).ifPresent(value -> this.name = value);
         Optional.ofNullable(settlementType).ifPresent(value -> this.settlementType = value);
         Optional.ofNullable(price).ifPresent(value -> this.price = value);
         Optional.ofNullable(priority).ifPresent(value -> this.priority = value);
         Optional.ofNullable(settlementParticipantStatus).ifPresent(value -> this.settlementParticipantStatus = value);
+        Optional.ofNullable(percentage).ifPresent(value -> this.percentage = value);
     }
 
 }

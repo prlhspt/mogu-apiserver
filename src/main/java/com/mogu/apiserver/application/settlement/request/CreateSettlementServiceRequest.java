@@ -37,6 +37,7 @@ public class CreateSettlementServiceRequest {
         Long price;
         Integer priority;
         SettlementType settlementType;
+        Integer percentage;
 
     }
 

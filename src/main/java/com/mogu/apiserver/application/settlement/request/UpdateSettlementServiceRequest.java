@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -52,6 +53,9 @@ public class UpdateSettlementServiceRequest {
         private SettlementType settlementType;
 
         private SettlementParticipantStatus settlementParticipantStatus;
+
+        private Integer percentage;
+
     }
 
 }
