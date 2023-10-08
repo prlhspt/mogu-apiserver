@@ -264,7 +264,7 @@ class SettlementServiceTest {
         settlement.setUser(user);
         settlementJpaRepository.save(settlement);
 
-        FindSettlementResponse findSettlementResponse = settlementService.findSettlement(settlement.getId(), user.getId());
+        FindSettlementResponse findSettlementResponse = settlementService.findSettlement(settlement.getId());
 
         assertThat(findSettlementResponse).isNotNull();
         assertThat(findSettlementResponse)
@@ -293,7 +293,7 @@ class SettlementServiceTest {
         userJpaRepository.save(user);
         accountJpaRepository.save(account);
 
-        assertThatThrownBy(() -> settlementService.findSettlement(1L, user.getId()))
+        assertThatThrownBy(() -> settlementService.findSettlement(1L))
                 .isInstanceOf(SettlementNotFound.class)
                 .hasMessage("정산 내역을 찾을 수 없습니다.");
 

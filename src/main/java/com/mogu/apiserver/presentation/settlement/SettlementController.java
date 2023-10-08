@@ -79,14 +79,12 @@ public class SettlementController {
             @ApiResponse(responseCode = "500", description = "서버 에러",
                     content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
     })
-    @GetMapping("/settlements/{settlementId}/users/{userId}")
+    @GetMapping("/settlements/{settlementId}")
     public ApiResponseEntity<FindSettlementResponse> findSettlement(
-            @PathVariable Long settlementId,
-            @PathVariable Long userId
+            @PathVariable Long settlementId
     ) {
 
-        authenticationService.verifyIdentity(userId);
-        return ApiResponseEntity.ok(settlementService.findSettlement(settlementId, userId));
+        return ApiResponseEntity.ok(settlementService.findSettlement(settlementId));
 
     }
 

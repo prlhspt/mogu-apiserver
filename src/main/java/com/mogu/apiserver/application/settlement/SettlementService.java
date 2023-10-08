@@ -105,8 +105,8 @@ public class SettlementService {
         return settlementRepository.findSettlements(pageDateQuery, userId);
     }
 
-    public FindSettlementResponse findSettlement(Long settlementId, Long userId) {
-        Settlement settlement = settlementRepository.findSettlementById(settlementId, userId)
+    public FindSettlementResponse findSettlement(Long settlementId) {
+        Settlement settlement = settlementRepository.findSettlementById(settlementId)
                 .orElseThrow(SettlementNotFound::new);
 
         return FindSettlementResponse.of(settlement);
@@ -116,7 +116,7 @@ public class SettlementService {
     @Transactional
     public UpdateSettlementResponse updateSettlement(UpdateSettlementServiceRequest updateSettlementServiceRequest, Long settlementId, Long userId) {
 
-        Settlement settlement = settlementRepository.findSettlementById(settlementId, userId)
+        Settlement settlement = settlementRepository.findSettlementById(settlementId)
                 .orElseThrow(SettlementNotFound::new);
 
         settlement.updateNotNullValue(updateSettlementServiceRequest.getBankCode(), updateSettlementServiceRequest.getAccountNumber(), updateSettlementServiceRequest.getAccountName(), updateSettlementServiceRequest.getMessage(), updateSettlementServiceRequest.getTotalPrice());

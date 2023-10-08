@@ -121,8 +121,8 @@ class SettlementControllerTest {
     @DisplayName("정산 내역을 조회한다.")
     void findSettlement() throws Exception {
 
-        when(settlementService.findSettlement(any(Long.class), any(Long.class))).thenReturn(null);
-        mockMvc.perform(get("/settlements/1/users/1"))
+        when(settlementService.findSettlement(any(Long.class))).thenReturn(null);
+        mockMvc.perform(get("/settlements/1"))
                 .andDo(print())
                 .andExpect(status().isOk());
 

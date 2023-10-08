@@ -9,6 +9,6 @@ public interface SettlementRepository {
 
     PaginationResult<Settlement> findSettlements(PageDateQuery pageDateQuery, Long userId);
 
-    Optional<Settlement> findSettlementById(Long settlementId, Long userId);
+    Optional<Settlement> findSettlementById(Long settlementId);
 
 }

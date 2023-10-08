@@ -44,12 +44,11 @@ public class SettlementRepositoryImpl implements SettlementRepository {
     }
 
     @Override
-    public Optional<Settlement> findSettlementById(Long settlementId, Long userId) {
+    public Optional<Settlement> findSettlementById(Long settlementId) {
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(settlement)
-                        .where(settlement.id.eq(settlementId),
-                                settlement.user.id.eq(userId))
+                        .where(settlement.id.eq(settlementId))
                         .fetchOne()
         );
     }

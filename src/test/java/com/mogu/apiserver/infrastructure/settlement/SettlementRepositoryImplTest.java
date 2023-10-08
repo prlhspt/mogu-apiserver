@@ -92,7 +92,7 @@ class SettlementRepositoryImplTest {
         userJpaRepository.save(user);
         settlementJpaRepository.save(settlement);
 
-        Settlement findSettlement = settlementRepository.findSettlementById(settlement.getId(), user.getId())
+        Settlement findSettlement = settlementRepository.findSettlementById(settlement.getId())
                 .orElseThrow(SettlementNotFound::new);
 
         assertThat(findSettlement.getTotalPrice()).isEqualTo(3000L);
