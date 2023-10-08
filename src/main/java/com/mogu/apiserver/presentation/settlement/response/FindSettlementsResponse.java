@@ -31,6 +31,10 @@ public class FindSettlementsResponse {
     @Getter
     @Builder
     private static class SettlementResponse {
+
+        @Schema(description = "정산 ID", example = "1")
+        private Long id;
+
         @Schema(description = "총 금액", example = "10000")
         private Long totalPrice;
 
@@ -47,6 +51,7 @@ public class FindSettlementsResponse {
         return FindSettlementsResponse.builder()
                 .settlements(paginationSettlements.getData().stream()
                         .map(settlement -> SettlementResponse.builder()
+                                .id(settlement.getId())
                                 .totalPrice(settlement.getTotalPrice())
                                 .status(settlement.getStatus())
                                 .date(settlement.getCreatedDate())
