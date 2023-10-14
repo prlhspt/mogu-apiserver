@@ -12,7 +12,6 @@ import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import com.mogu.apiserver.domain.settlement.exception.MissingPercentageException;
-import com.mogu.apiserver.domain.settlement.exception.PercentageMismatchException;
 import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
 import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.enums.UserStatus;
@@ -367,7 +366,7 @@ class SettlementServiceTest {
                 )
                 .build();
 
-        settlementService.updateSettlement(request, settlement.getId(), user.getId());
+        settlementService.updateSettlement(request, settlement.getId());
 
         Settlement findSettlement = settlementJpaRepository.findById(settlement.getId())
                 .orElseThrow(SettlementNotFound::new);

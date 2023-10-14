@@ -9,7 +9,6 @@ import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.domain.user.exception.UserNotFoundException;
 import com.mogu.apiserver.infrastructure.account.AccountJpaRepository;
 import com.mogu.apiserver.infrastructure.user.UserJpaRepository;
-import com.mogu.apiserver.presentation.user.request.UpdateUserRequest;
 import com.mogu.apiserver.presentation.user.response.CheckUserResponse;
 import com.mogu.apiserver.presentation.user.response.GetUserInfoResponse;
 import com.mogu.apiserver.presentation.user.response.UpdateUserResponse;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Service

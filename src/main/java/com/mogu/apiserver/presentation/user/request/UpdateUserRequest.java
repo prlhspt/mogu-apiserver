@@ -1,13 +1,12 @@
 package com.mogu.apiserver.presentation.user.request;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.mogu.apiserver.application.user.request.UpdateUserServiceRequest;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@JsonDeserialize(builder = UpdateUserRequest.UpdateUserRequestBuilder.class)
+@NoArgsConstructor
 public class UpdateUserRequest {
 
     private String nickname;
@@ -18,4 +17,8 @@ public class UpdateUserRequest {
                 .build();
     }
 
+    @Builder
+    public UpdateUserRequest(String nickname) {
+        this.nickname = nickname;
+    }
 }

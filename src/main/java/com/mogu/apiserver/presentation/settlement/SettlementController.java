@@ -104,7 +104,7 @@ public class SettlementController {
     ) {
 
         authenticationService.verifyIdentity(userId);
-        return ApiResponseEntity.ok(settlementService.updateSettlement(updateSettlementRequest.toServiceRequest(), settlementId, userId));
+        return ApiResponseEntity.ok(settlementService.updateSettlement(updateSettlementRequest.toServiceRequest(), settlementId));
 
     }
 }

@@ -6,17 +6,15 @@ import com.mogu.apiserver.application.settlement.request.UpdateSettlementService
 import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class UpdateSettlementRequest {
 
     @Schema(description = "은행 코드", example = "004")
@@ -41,10 +39,10 @@ public class UpdateSettlementRequest {
     private List<UpdateSettlementStagesRequest> settlementStage;
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class UpdateSettlementStagesRequest {
 
-        @Schema(description = "정산 단계 레벨", example = "1")
+        @Schema(description = "정산 단계 id", example = "1")
         private Long id;
 
         @Schema(description = "정산 단계 레벨", example = "1")
@@ -53,10 +51,15 @@ public class UpdateSettlementRequest {
         @Schema(description = "정산 참여자")
         private List<UpdateSettlementParticipantsRequest> participants;
 
+        @Builder
+        public UpdateSettlementStagesRequest(Integer level, List<UpdateSettlementParticipantsRequest> participants) {
+            this.level = level;
+            this.participants = participants;
+        }
     }
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class UpdateSettlementParticipantsRequest {
 
         @Schema(description = "정산 참여자의 id", example = "1")
@@ -79,6 +82,27 @@ public class UpdateSettlementRequest {
 
         @Schema(description = "정산 참여자 정산 비율", example = "15")
         private Integer percentage;
+
+        @Builder
+        public UpdateSettlementParticipantsRequest(String name, Long price, Integer priority, SettlementType settlementType, SettlementParticipantStatus settlementParticipantStatus, Integer percentage) {
+            this.name = name;
+            this.price = price;
+            this.priority = priority;
+            this.settlementType = settlementType;
+            this.settlementParticipantStatus = settlementParticipantStatus;
+            this.percentage = percentage;
+        }
+    }
+
+    @Builder
+    public UpdateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, Long userId, List<UpdateSettlementStagesRequest> settlementStage) {
+        this.bankCode = bankCode;
+        this.accountName = accountName;
+        this.accountNumber = accountNumber;
+        this.message = message;
+        this.totalPrice = totalPrice;
+        this.userId = userId;
+        this.settlementStage = settlementStage;
     }
 
     public UpdateSettlementServiceRequest toServiceRequest() {

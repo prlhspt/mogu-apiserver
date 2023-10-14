@@ -155,7 +155,7 @@ class SettlementControllerTest {
                 ))
                 .build();
 
-        when(settlementService.updateSettlement(any(), any(Long.class), any(Long.class))).thenReturn(null);
+        when(settlementService.updateSettlement(any(), any(Long.class))).thenReturn(null);
         mockMvc.perform(patch("/settlements/1/users/1")
                         .content(objectMapper.writeValueAsString(updateSettlementRequest))
                         .contentType("application/json"))

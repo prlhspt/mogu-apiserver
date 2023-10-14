@@ -7,9 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class RegisterRequest {
 
     @Schema(example = "test@test.com", description = "이메일")
@@ -32,5 +33,12 @@ public class RegisterRequest {
                 .password(password)
                 .nickname(nickname)
                 .build();
+    }
+
+    @Builder
+    public RegisterRequest(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
     }
 }

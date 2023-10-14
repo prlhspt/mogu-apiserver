@@ -7,7 +7,6 @@ import com.mogu.apiserver.domain.user.User;
 import com.mogu.apiserver.domain.user.UserRepository;
 import com.mogu.apiserver.domain.user.exception.InactivateUserException;
 import com.mogu.apiserver.domain.user.exception.UserNotFoundException;
-import com.mogu.apiserver.presentation.user.request.UpdateUserRequest;
 import com.mogu.apiserver.presentation.user.response.CheckUserResponse;
 import com.mogu.apiserver.presentation.user.response.DeleteUserResponse;
 import com.mogu.apiserver.presentation.user.response.GetUserInfoResponse;

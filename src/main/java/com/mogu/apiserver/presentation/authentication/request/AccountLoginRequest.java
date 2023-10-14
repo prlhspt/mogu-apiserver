@@ -7,9 +7,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class AccountLoginRequest {
 
     @Schema(example = "test@test.com", description = "이메일")
@@ -27,5 +28,11 @@ public class AccountLoginRequest {
                 .email(email)
                 .password(password)
                 .build();
+    }
+
+    @Builder
+    public AccountLoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 }

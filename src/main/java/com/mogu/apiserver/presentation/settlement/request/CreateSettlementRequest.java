@@ -9,12 +9,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class CreateSettlementRequest {
     @Schema(description = "은행 코드", example = "004")
     private String bankCode;
@@ -42,7 +43,7 @@ public class CreateSettlementRequest {
     private List<CreateSettlementStagesRequest> settlementStage;
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class CreateSettlementStagesRequest {
 
         @NotNull(message = "정산 단계 레벨은 필수입니다.")
@@ -54,10 +55,15 @@ public class CreateSettlementRequest {
         @Schema(description = "정산 참여자")
         List<CreateSettlementParticipantsRequest> participants;
 
+        @Builder
+        public CreateSettlementStagesRequest(Integer level, List<CreateSettlementParticipantsRequest> participants) {
+            this.level = level;
+            this.participants = participants;
+        }
     }
 
     @Getter
-    @Builder
+    @NoArgsConstructor
     public static class CreateSettlementParticipantsRequest {
 
         @NotNull(message = "정산 참여자의 이름은 필수입니다.")
@@ -78,6 +84,26 @@ public class CreateSettlementRequest {
 
         @Schema(description = "정산 참여자 퍼센트 비율", example = "15")
         Integer percentage;
+
+        @Builder
+        public CreateSettlementParticipantsRequest(String name, Long price, Integer priority, SettlementType settlementType, Integer percentage) {
+            this.name = name;
+            this.price = price;
+            this.priority = priority;
+            this.settlementType = settlementType;
+            this.percentage = percentage;
+        }
+    }
+
+    @Builder
+    private CreateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, Long userId, List<CreateSettlementStagesRequest> settlementStage) {
+        this.bankCode = bankCode;
+        this.accountName = accountName;
+        this.accountNumber = accountNumber;
+        this.message = message;
+        this.totalPrice = totalPrice;
+        this.userId = userId;
+        this.settlementStage = settlementStage;
     }
 
     public CreateSettlementServiceRequest toServiceRequest() {
@@ -106,5 +132,6 @@ public class CreateSettlementRequest {
                 .build();
 
     }
+
 }
 

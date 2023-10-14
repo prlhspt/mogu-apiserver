@@ -114,7 +114,7 @@ public class SettlementService {
     }
 
     @Transactional
-    public UpdateSettlementResponse updateSettlement(UpdateSettlementServiceRequest updateSettlementServiceRequest, Long settlementId, Long userId) {
+    public UpdateSettlementResponse updateSettlement(UpdateSettlementServiceRequest updateSettlementServiceRequest, Long settlementId) {
 
         Settlement settlement = settlementRepository.findSettlementById(settlementId)
                 .orElseThrow(SettlementNotFound::new);
