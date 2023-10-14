@@ -1,9 +1,6 @@
 package com.mogu.apiserver.application.settlement;
 
 import com.mogu.apiserver.application.settlement.request.CreateSettlementServiceRequest;
-import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest;
-import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementParticipantsServiceRequest;
-import com.mogu.apiserver.application.settlement.request.UpdateSettlementServiceRequest.UpdateSettlementStageRequestService;
 import com.mogu.apiserver.domain.account.Account;
 import com.mogu.apiserver.domain.settlement.Settlement;
 import com.mogu.apiserver.domain.settlement.SettlementParticipant;
@@ -295,92 +292,6 @@ class SettlementServiceTest {
         assertThatThrownBy(() -> settlementService.findSettlement(1L))
                 .isInstanceOf(SettlementNotFound.class)
                 .hasMessage("정산 내역을 찾을 수 없습니다.");
-
-    }
-
-    @Test
-    @DisplayName("정산을 수정한다.")
-    void updateSettlement() {
-
-        Account account = Account.builder()
-                .email("test@test.com")
-                .password(passwordEncoder.encode("test123"))
-                .build();
-
-        User user = User.builder()
-                .nickname("test")
-                .status(UserStatus.ACTIVE)
-                .type(UserType.USER)
-                .build();
-
-        account.setUser(user);
-
-        Settlement settlement = Settlement.builder()
-                .accountName("홍길동")
-                .accountNumber("123456789")
-                .bankCode("001")
-                .message("정산 요청합니다.")
-                .status(SettlementStatus.WAITING)
-                .totalPrice(10000L)
-                .build();
-
-        SettlementStage settlementStage = SettlementStage.builder()
-                .level(1)
-                .build();
-
-        SettlementParticipant settlementParticipant = SettlementParticipant.builder()
-                .name("홍길동")
-                .settlementType(SettlementType.PERCENT)
-                .price(10000L)
-                .priority(1)
-                .settlementParticipantStatus(SettlementParticipantStatus.WAITING)
-                .build();
-
-        userJpaRepository.save(user);
-        accountJpaRepository.save(account);
-
-        settlementStage.addSettlementParticipant(settlementParticipant);
-        settlement.addSettlementStage(settlementStage);
-        settlement.setUser(user);
-        settlementJpaRepository.save(settlement);
-
-        UpdateSettlementServiceRequest request = UpdateSettlementServiceRequest.builder()
-                .bankCode("002")
-                .totalPrice(20000L)
-                .settlementStage(
-                        List.of(
-                                UpdateSettlementStageRequestService.builder()
-                                        .id(settlementStage.getId())
-                                        .level(2)
-                                        .participants(
-                                                List.of(
-                                                        UpdateSettlementParticipantsServiceRequest.builder()
-                                                                .id(settlementParticipant.getId())
-                                                                .price(20000L)
-                                                                .settlementParticipantStatus(SettlementParticipantStatus.DONE)
-                                                                .build()
-                                                )
-                                        )
-                                        .build()
-                        )
-                )
-                .build();
-
-        settlementService.updateSettlement(request, settlement.getId());
-
-        Settlement findSettlement = settlementJpaRepository.findById(settlement.getId())
-                .orElseThrow(SettlementNotFound::new);
-
-        assertThat(findSettlement).isNotNull();
-        assertThat(findSettlement)
-                .extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice")
-                .contains("002", "홍길동", "123456789", "정산 요청합니다.", 20000L);
-
-        assertThat(findSettlement.getSettlementStages().get(0).getLevel()).isEqualTo(2);
-
-        assertThat(findSettlement.getSettlementStages().get(0).getSettlementParticipants().get(0))
-                .extracting("name", "settlementType", "price", "priority", "settlementParticipantStatus")
-                .contains("홍길동", SettlementType.PERCENT, 20000L, 1, SettlementParticipantStatus.DONE);
 
     }
 

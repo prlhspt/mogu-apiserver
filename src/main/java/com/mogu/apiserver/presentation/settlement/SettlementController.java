@@ -7,11 +7,9 @@ import com.mogu.apiserver.global.pagination.PageDateRequestDto;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.global.util.ApiResponseEntity;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest;
-import com.mogu.apiserver.presentation.settlement.request.UpdateSettlementRequest;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementsResponse;
-import com.mogu.apiserver.presentation.settlement.response.UpdateSettlementResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -88,23 +86,4 @@ public class SettlementController {
 
     }
 
-    @Operation(summary = "정산 수정")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "정산 수정 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
-            @ApiResponse(responseCode = "500", description = "서버 에러",
-                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
-    })
-    @PatchMapping("/settlements/{settlementId}/users/{userId}")
-    public ApiResponseEntity<UpdateSettlementResponse> updateSettlement(
-            @PathVariable Long settlementId,
-            @PathVariable Long userId,
-            @RequestBody UpdateSettlementRequest updateSettlementRequest
-    ) {
-
-        authenticationService.verifyIdentity(userId);
-        return ApiResponseEntity.ok(settlementService.updateSettlement(updateSettlementRequest.toServiceRequest(), settlementId));
-
-    }
 }

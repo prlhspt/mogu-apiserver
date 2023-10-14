@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mogu.apiserver.application.authentication.AuthenticationService;
 import com.mogu.apiserver.application.settlement.SettlementService;
 import com.mogu.apiserver.domain.authentication.JwtTokenProvider;
-import com.mogu.apiserver.domain.settlement.enums.SettlementParticipantStatus;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import com.mogu.apiserver.global.pagination.PageDateQuery;
 import com.mogu.apiserver.global.pagination.PaginationResult;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest.CreateSettlementParticipantsRequest;
 import com.mogu.apiserver.presentation.settlement.request.CreateSettlementRequest.CreateSettlementStagesRequest;
-import com.mogu.apiserver.presentation.settlement.request.UpdateSettlementRequest;
-import com.mogu.apiserver.presentation.settlement.request.UpdateSettlementRequest.UpdateSettlementParticipantsRequest;
-import com.mogu.apiserver.presentation.settlement.request.UpdateSettlementRequest.UpdateSettlementStagesRequest;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +25,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -123,42 +120,6 @@ class SettlementControllerTest {
 
         when(settlementService.findSettlement(any(Long.class))).thenReturn(null);
         mockMvc.perform(get("/settlements/1"))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-    }
-
-    @Test
-    @DisplayName("정산 내역을 수정한다.")
-    void updateSettlement() throws Exception {
-
-        UpdateSettlementRequest updateSettlementRequest = UpdateSettlementRequest.builder()
-                .bankCode("004")
-                .accountName("홍길동")
-                .accountNumber("123456789")
-                .message("정산 요청합니다.")
-                .totalPrice(10000L)
-                .userId(1L)
-                .settlementStage(List.of(
-                        UpdateSettlementStagesRequest.builder()
-                                .level(1)
-                                .participants(List.of(
-                                        UpdateSettlementParticipantsRequest.builder()
-                                                .name("홍길동")
-                                                .price(10000L)
-                                                .priority(1)
-                                                .settlementType(SettlementType.DUTCH_PAY)
-                                                .settlementParticipantStatus(SettlementParticipantStatus.DONE)
-                                                .build()
-                                ))
-                                .build()
-                ))
-                .build();
-
-        when(settlementService.updateSettlement(any(), any(Long.class))).thenReturn(null);
-        mockMvc.perform(patch("/settlements/1/users/1")
-                        .content(objectMapper.writeValueAsString(updateSettlementRequest))
-                        .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
