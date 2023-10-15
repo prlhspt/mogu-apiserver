@@ -37,6 +37,9 @@ public class CreateSettlementRequest {
     @Schema(description = "정산 요청자의 ID", example = "1")
     private Long userId;
 
+    @Schema(description = "정산 이미지", example = "[\"https://mogu-settlement-image.s3.ap-northeast-2.amazonaws.com/dd3d2e49-c1d6-4512-91bf-6ecf857072fb.jpg\"]")
+    private List<String> settlementImages;
+
     @Valid
     @NotNull(message = "정산 단계는 필수입니다.")
     @Schema(description = "정산 단계")
@@ -96,13 +99,14 @@ public class CreateSettlementRequest {
     }
 
     @Builder
-    private CreateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, Long userId, List<CreateSettlementStagesRequest> settlementStage) {
+    public CreateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, Long userId, List<String> settlementImages, List<CreateSettlementStagesRequest> settlementStage) {
         this.bankCode = bankCode;
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.message = message;
         this.totalPrice = totalPrice;
         this.userId = userId;
+        this.settlementImages = settlementImages;
         this.settlementStage = settlementStage;
     }
 
@@ -128,6 +132,7 @@ public class CreateSettlementRequest {
                 .accountNumber(accountNumber)
                 .message(message)
                 .totalPrice(totalPrice)
+                .settlementImages(settlementImages)
                 .settlementStage(settlementServiceRequestStages)
                 .build();
 

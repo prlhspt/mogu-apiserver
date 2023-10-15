@@ -34,6 +34,9 @@ public class FindSettlementResponse {
     @Schema(description = "정산 요청자의 ID", example = "1")
     private Long userId;
 
+    @Schema(description = "정산 이미지", example = "[\"https://mogu-settlement-image.s3.ap-northeast-2.amazonaws.com/dd3d2e49-c1d6-4512-91bf-6ecf857072fb.jpg\"]")
+    private List<String> settlementImages;
+
     @Schema(description = "정산 단계")
     private List<FindSettlementStageResponse> settlementStages;
 
@@ -45,6 +48,11 @@ public class FindSettlementResponse {
                 .message(settlement.getMessage())
                 .totalPrice(settlement.getTotalPrice())
                 .userId(settlement.getUser().getId())
+                .settlementImages((settlement.getSettlementImages() != null)
+                        ? settlement.getSettlementImages().stream()
+                        .map(settlementImage -> settlementImage.getImagePath())
+                        .collect(toList())
+                        : null)
                 .settlementStages(FindSettlementStageResponse.of(settlement.getSettlementStages()))
                 .build();
     }

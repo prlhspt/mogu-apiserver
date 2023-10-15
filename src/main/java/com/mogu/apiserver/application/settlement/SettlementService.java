@@ -15,25 +15,36 @@ import com.mogu.apiserver.domain.settlement.exception.MissingPercentageException
 import com.mogu.apiserver.domain.settlement.exception.SettlementNotFound;
 import com.mogu.apiserver.global.pagination.PageDateQuery;
 import com.mogu.apiserver.global.pagination.PaginationResult;
+import com.mogu.apiserver.global.property.AwsS3Property;
+import com.mogu.apiserver.infrastructure.s3.S3PreSignedUrlGenerator;
 import com.mogu.apiserver.infrastructure.settlement.SettlementJpaRepository;
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
+import com.mogu.apiserver.presentation.settlement.response.GeneratePreSignedUrlsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SettlementService {
 
+    private static final String S3_PREFIX = "settlements";
+
     private final SettlementRepository settlementRepository;
 
     private final SettlementJpaRepository settlementJpaRepository;
 
     private final AccountRepository accountRepository;
+
+    private final S3PreSignedUrlGenerator s3PreSignedUrlGenerator;
+
+    private final AwsS3Property awsS3Property;
+
 
     @Transactional
     public CreateSettlementResponse createSettlement(CreateSettlementServiceRequest createSettlementServiceRequest, Long userId) {
@@ -48,7 +59,8 @@ public class SettlementService {
                 createSettlementServiceRequest.getAccountNumber(),
                 createSettlementServiceRequest.getAccountName(),
                 createSettlementServiceRequest.getMessage(),
-                SettlementStatus.WAITING
+                SettlementStatus.WAITING,
+                createSettlementServiceRequest.getSettlementImages()
         );
 
         List<SettlementStage> settlementStages = createSettlementServiceRequest.getSettlementStage().stream()
@@ -103,6 +115,19 @@ public class SettlementService {
 
         return FindSettlementResponse.of(settlement);
 
+    }
+
+
+    public GeneratePreSignedUrlsResponse generateSettlementPreSignedUrl() {
+        String preSignedUrl = s3PreSignedUrlGenerator.getPreSignedUrl(
+                awsS3Property.bucketName,
+                S3_PREFIX,
+                UUID.randomUUID() + ".jpg"
+        );
+
+        return GeneratePreSignedUrlsResponse.builder()
+                .url(preSignedUrl)
+                .build();
     }
 
 }

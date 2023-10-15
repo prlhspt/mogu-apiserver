@@ -10,6 +10,7 @@ import com.mogu.apiserver.presentation.settlement.request.CreateSettlementReques
 import com.mogu.apiserver.presentation.settlement.response.CreateSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementResponse;
 import com.mogu.apiserver.presentation.settlement.response.FindSettlementsResponse;
+import com.mogu.apiserver.presentation.settlement.response.GeneratePreSignedUrlsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -81,9 +82,21 @@ public class SettlementController {
     public ApiResponseEntity<FindSettlementResponse> findSettlement(
             @PathVariable Long settlementId
     ) {
-
         return ApiResponseEntity.ok(settlementService.findSettlement(settlementId));
 
+    }
+
+    @Operation(summary = "정산 이미지 업로드 URL 생성")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "정산 이미지 업로드 URL 생성 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
+    })
+    @PostMapping("/settlements/pre-signed-url")
+    public ApiResponseEntity<GeneratePreSignedUrlsResponse> generatePreSignedUrls() {
+        return ApiResponseEntity.ok(settlementService.generateSettlementPreSignedUrl());
     }
 
 }

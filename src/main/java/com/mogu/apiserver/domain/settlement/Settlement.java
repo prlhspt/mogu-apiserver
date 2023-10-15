@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @Getter
@@ -23,7 +26,7 @@ public class Settlement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "총 금액은 필수입니다.")
     private Long totalPrice;
 
     private String bankCode;
@@ -32,29 +35,39 @@ public class Settlement extends BaseEntity {
     private String accountName;
     private String message;
 
+
     @Enumerated(EnumType.STRING)
-    @NotNull
+    @NotNull(message = "정산 상태는 필수입니다.")
     private SettlementStatus status;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "settlement_image", joinColumns = @JoinColumn(name = "settlement_id", referencedColumnName = "id"))
+    private Set<SettlementImage> settlementImages;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull
+    @NotNull(message = "정산 요청자는 필수입니다.")
     private User user;
 
     @OneToMany(mappedBy = "settlement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SettlementStage> settlementStages = new ArrayList<>();
 
     @Builder
-    private Settlement(Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status) {
+    public Settlement(Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
         this.totalPrice = totalPrice;
         this.bankCode = bankCode;
         this.accountNumber = accountNumber;
         this.accountName = accountName;
         this.message = message;
         this.status = status;
+        this.settlementImages = settlementImages != null
+                ? settlementImages.stream()
+                .map(SettlementImage::create)
+                .collect(toSet())
+                : null;
     }
 
-    public static Settlement create(User user, Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status) {
-        Settlement settlement = new Settlement(totalPrice, bankCode, accountNumber, accountName, message, status);
+    public static Settlement create(User user, Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
+        Settlement settlement = new Settlement(totalPrice, bankCode, accountNumber, accountName, message, status, settlementImages);
         settlement.setUser(user);
 
         return settlement;

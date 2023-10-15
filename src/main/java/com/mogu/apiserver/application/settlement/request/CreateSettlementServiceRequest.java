@@ -3,11 +3,12 @@ package com.mogu.apiserver.application.settlement.request;
 import com.mogu.apiserver.domain.settlement.enums.SettlementType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class CreateSettlementServiceRequest {
 
     private String bankCode;
@@ -17,6 +18,8 @@ public class CreateSettlementServiceRequest {
     private String message;
 
     private Long totalPrice;
+
+    private List<String> settlementImages;
 
     private List<CreateSettlementStagesServiceRequest> settlementStage;
 
@@ -41,13 +44,14 @@ public class CreateSettlementServiceRequest {
 
     }
 
-    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<CreateSettlementStagesServiceRequest> settlementStage) {
+    @Builder
+    public CreateSettlementServiceRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, List<String> settlementImages, List<CreateSettlementStagesServiceRequest> settlementStage) {
         this.bankCode = bankCode;
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.message = message;
         this.totalPrice = totalPrice;
+        this.settlementImages = settlementImages;
         this.settlementStage = settlementStage;
     }
-
 }
