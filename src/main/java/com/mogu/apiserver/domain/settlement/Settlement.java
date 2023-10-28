@@ -26,9 +26,6 @@ public class Settlement extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "총 금액은 필수입니다.")
-    private Long totalPrice;
-
     private String bankCode;
 
     private String accountNumber;
@@ -52,8 +49,7 @@ public class Settlement extends BaseEntity {
     private List<SettlementStage> settlementStages = new ArrayList<>();
 
     @Builder
-    public Settlement(Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
-        this.totalPrice = totalPrice;
+    public Settlement(String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
         this.bankCode = bankCode;
         this.accountNumber = accountNumber;
         this.accountName = accountName;
@@ -66,8 +62,8 @@ public class Settlement extends BaseEntity {
                 : null;
     }
 
-    public static Settlement create(User user, Long totalPrice, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
-        Settlement settlement = new Settlement(totalPrice, bankCode, accountNumber, accountName, message, status, settlementImages);
+    public static Settlement create(User user, String bankCode, String accountNumber, String accountName, String message, SettlementStatus status, List<String> settlementImages) {
+        Settlement settlement = new Settlement(bankCode, accountNumber, accountName, message, status, settlementImages);
         settlement.setUser(user);
 
         return settlement;
@@ -82,12 +78,11 @@ public class Settlement extends BaseEntity {
         settlementStage.setSettlement(this);
     }
 
-    public void updateNotNullValue(String bankCode, String accountNumber, String accountName, String message, Long totalPrice) {
+    public void updateNotNullValue(String bankCode, String accountNumber, String accountName, String message) {
         Optional.ofNullable(bankCode).ifPresent(value -> this.bankCode = value);
         Optional.ofNullable(accountNumber).ifPresent(value -> this.accountNumber = value);
         Optional.ofNullable(accountName).ifPresent(value -> this.accountName = value);
         Optional.ofNullable(message).ifPresent(value -> this.message = value);
-        Optional.ofNullable(totalPrice).ifPresent(value -> this.totalPrice = value);
     }
 
 }

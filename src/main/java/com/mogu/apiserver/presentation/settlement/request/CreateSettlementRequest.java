@@ -30,10 +30,6 @@ public class CreateSettlementRequest {
     @Schema(description = "메세지", example = "정산 요청합니다.")
     private String message;
 
-    @NotNull(message = "총 금액은 필수입니다.")
-    @Schema(description = "총 금액", example = "10000")
-    private Long totalPrice;
-
     @Schema(description = "정산 요청자의 ID", example = "1")
     private Long userId;
 
@@ -53,14 +49,19 @@ public class CreateSettlementRequest {
         @Schema(description = "정산 단계 레벨", example = "1")
         Integer level;
 
+        @NotNull(message = "총 금액은 필수입니다.")
+        @Schema(description = "총 금액", example = "10000")
+        private Long totalPrice;
+
         @Valid
         @NotNull(message = "정산 참여자는 필수입니다.")
         @Schema(description = "정산 참여자")
         List<CreateSettlementParticipantsRequest> participants;
 
         @Builder
-        public CreateSettlementStagesRequest(Integer level, List<CreateSettlementParticipantsRequest> participants) {
+        public CreateSettlementStagesRequest(Integer level, Long totalPrice, List<CreateSettlementParticipantsRequest> participants) {
             this.level = level;
+            this.totalPrice = totalPrice;
             this.participants = participants;
         }
     }
@@ -99,12 +100,11 @@ public class CreateSettlementRequest {
     }
 
     @Builder
-    public CreateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long totalPrice, Long userId, List<String> settlementImages, List<CreateSettlementStagesRequest> settlementStage) {
+    public CreateSettlementRequest(String bankCode, String accountName, String accountNumber, String message, Long userId, List<String> settlementImages, List<CreateSettlementStagesRequest> settlementStage) {
         this.bankCode = bankCode;
         this.accountName = accountName;
         this.accountNumber = accountNumber;
         this.message = message;
-        this.totalPrice = totalPrice;
         this.userId = userId;
         this.settlementImages = settlementImages;
         this.settlementStage = settlementStage;
@@ -114,6 +114,7 @@ public class CreateSettlementRequest {
         List<CreateSettlementStagesServiceRequest> settlementServiceRequestStages = settlementStage.stream()
                 .map(settlementStage -> CreateSettlementStagesServiceRequest.builder()
                         .level(settlementStage.getLevel())
+                        .totalPrice(settlementStage.getTotalPrice())
                         .participants(settlementStage.getParticipants().stream()
                                 .map(participants -> CreateSettlementParticipantsServiceRequest.builder()
                                         .name(participants.getName())
@@ -131,7 +132,6 @@ public class CreateSettlementRequest {
                 .accountName(accountName)
                 .accountNumber(accountNumber)
                 .message(message)
-                .totalPrice(totalPrice)
                 .settlementImages(settlementImages)
                 .settlementStage(settlementServiceRequestStages)
                 .build();

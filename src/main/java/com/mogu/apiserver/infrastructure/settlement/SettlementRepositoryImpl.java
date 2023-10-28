@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mogu.apiserver.domain.settlement.QSettlement.settlement;
+import static com.mogu.apiserver.domain.settlement.QSettlementStage.settlementStage;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class SettlementRepositoryImpl implements SettlementRepository {
                 .where(settlement.user.id.eq(userId),
                         createdDateStart(pageDateQuery.getStartDate()),
                         createdDateEnd(pageDateQuery.getEndDate()))
+                .join(settlement.settlementStages, settlementStage).fetchJoin()
                 .offset(pageDateQuery.getOffset())
                 .limit(pageDateQuery.getLimit())
                 .fetch();

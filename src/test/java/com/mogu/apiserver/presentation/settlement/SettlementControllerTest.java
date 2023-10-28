@@ -64,11 +64,11 @@ class SettlementControllerTest {
                 .accountName("홍길동")
                 .accountNumber("123456789")
                 .message("정산 요청합니다.")
-                .totalPrice(10000L)
                 .userId(1L)
                 .settlementStage(List.of(
                         CreateSettlementStagesRequest.builder()
                                 .level(1)
+                                .totalPrice(10000L)
                                 .participants(List.of(
                                         CreateSettlementParticipantsRequest.builder()
                                                 .name("홍길동")

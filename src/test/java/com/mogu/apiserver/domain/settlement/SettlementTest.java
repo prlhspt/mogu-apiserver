@@ -15,19 +15,17 @@ class SettlementTest {
                 .accountNumber("accountNumber")
                 .accountName("accountName")
                 .message("message")
-                .totalPrice(1000L)
                 .build();
 
         settlement.updateNotNullValue(
                 "changeBankCode",
                 "changeAccountNumber",
                 "changeAccountName",
-                "changeMessage",
-                2000L
+                "changeMessage"
         );
 
-        assertThat(settlement).extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice")
-                .containsExactly("changeBankCode", "changeAccountName", "changeAccountNumber", "changeMessage", 2000L);
+        assertThat(settlement).extracting("bankCode", "accountName", "accountNumber", "message")
+                .containsExactly("changeBankCode", "changeAccountName", "changeAccountNumber", "changeMessage");
 
     }
 
@@ -39,19 +37,17 @@ class SettlementTest {
                 .accountNumber("accountNumber")
                 .accountName("accountName")
                 .message("message")
-                .totalPrice(1000L)
                 .build();
 
         settlement.updateNotNullValue(
                 null,
                 null,
                 null,
-                null,
                 null
                 );
 
-        assertThat(settlement).extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice")
-                .containsExactly("bankCode", "accountName", "accountNumber", "message", 1000L);
+        assertThat(settlement).extracting("bankCode", "accountName", "accountNumber", "message")
+                .containsExactly("bankCode", "accountName", "accountNumber", "message");
 
     }
 }

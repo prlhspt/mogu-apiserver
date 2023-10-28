@@ -54,7 +54,6 @@ public class SettlementService {
 
         Settlement settlement = Settlement.create(
                 account.getUser(),
-                createSettlementServiceRequest.getTotalPrice(),
                 createSettlementServiceRequest.getBankCode(),
                 createSettlementServiceRequest.getAccountNumber(),
                 createSettlementServiceRequest.getAccountName(),
@@ -65,7 +64,7 @@ public class SettlementService {
 
         List<SettlementStage> settlementStages = createSettlementServiceRequest.getSettlementStage().stream()
                 .map(settlementStageRequest -> {
-                    SettlementStage stage = SettlementStage.create(settlementStageRequest.getLevel());
+                    SettlementStage stage = SettlementStage.create(settlementStageRequest.getLevel(), settlementStageRequest.getTotalPrice());
 
                     List<SettlementParticipant> participants = settlementStageRequest.getParticipants().stream()
                             .map(

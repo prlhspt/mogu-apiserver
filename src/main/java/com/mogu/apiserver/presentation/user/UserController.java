@@ -24,6 +24,11 @@ public class UserController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
 
+    @GetMapping("/test")
+    public void test() throws Exception {
+        throw new Exception("error");
+    }
+
     @Operation(summary = "회원 정보 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공"),
