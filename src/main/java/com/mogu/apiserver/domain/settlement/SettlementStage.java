@@ -23,6 +23,9 @@ public class SettlementStage {
     @NotNull
     private Integer level;
 
+    @NotNull(message = "총 금액은 필수입니다.")
+    private Long totalPrice;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private Settlement settlement;
@@ -31,12 +34,13 @@ public class SettlementStage {
     private List<SettlementParticipant> settlementParticipants = new ArrayList<>();
 
     @Builder
-    private SettlementStage(Integer level) {
+    private SettlementStage(Integer level, Long totalPrice) {
         this.level = level;
+        this.totalPrice = totalPrice;
     }
 
-    public static SettlementStage create(Integer level) {
-        SettlementStage settlementStage = new SettlementStage(level);
+    public static SettlementStage create(Integer level, Long totalPrice) {
+        SettlementStage settlementStage = new SettlementStage(level, totalPrice);
 
         return settlementStage;
     }

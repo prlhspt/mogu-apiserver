@@ -75,11 +75,11 @@ class SettlementServiceTest {
                 .accountName("홍길동")
                 .accountNumber("123456789")
                 .message("정산 요청합니다.")
-                .totalPrice(10000L)
                 .settlementStage(
                         List.of(
                                 CreateSettlementServiceRequest.CreateSettlementStagesServiceRequest.builder()
                                         .level(1)
+                                        .totalPrice(10000L)
                                         .participants(
                                                 List.of(
                                                         CreateSettlementServiceRequest.CreateSettlementParticipantsServiceRequest.builder()
@@ -125,11 +125,11 @@ class SettlementServiceTest {
                 .accountName("홍길동")
                 .accountNumber("123456789")
                 .message("정산 요청합니다.")
-                .totalPrice(10000L)
                 .settlementStage(
                         List.of(
                                 CreateSettlementServiceRequest.CreateSettlementStagesServiceRequest.builder()
                                         .level(1)
+                                        .totalPrice(10000L)
                                         .participants(
                                                 List.of(
                                                         CreateSettlementServiceRequest.CreateSettlementParticipantsServiceRequest.builder()
@@ -173,11 +173,11 @@ class SettlementServiceTest {
                 .bankCode("001")
                 .message("정산 요청합니다.")
                 .status(SettlementStatus.WAITING)
-                .totalPrice(10000L)
                 .build();
 
         SettlementStage settlementStage = SettlementStage.builder()
                 .level(1)
+                .totalPrice(10000L)
                 .build();
 
         SettlementParticipant settlementParticipant = SettlementParticipant.builder()
@@ -210,8 +210,8 @@ class SettlementServiceTest {
         assertThat(settlements.getRequestLimit()).isEqualTo(10);
         assertThat(settlements.getHasNext()).isEqualTo(false);
         assertThat(settlements.getData())
-                .extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice")
-                .contains(tuple("001", "홍길동", "123456789", "정산 요청합니다.", 10000L));
+                .extracting("bankCode", "accountName", "accountNumber", "message")
+                .contains(tuple("001", "홍길동", "123456789", "정산 요청합니다."));
     }
 
     @Test
@@ -237,11 +237,11 @@ class SettlementServiceTest {
                 .bankCode("001")
                 .message("정산 요청합니다.")
                 .status(SettlementStatus.WAITING)
-                .totalPrice(10000L)
                 .build();
 
         SettlementStage settlementStage = SettlementStage.builder()
                 .level(1)
+                .totalPrice(10000L)
                 .build();
 
         SettlementParticipant settlementParticipant = SettlementParticipant.builder()
@@ -264,8 +264,8 @@ class SettlementServiceTest {
 
         assertThat(findSettlementResponse).isNotNull();
         assertThat(findSettlementResponse)
-                .extracting("bankCode", "accountName", "accountNumber", "message", "totalPrice", "userId")
-                .contains("001", "홍길동", "123456789", "정산 요청합니다.", 10000L, user.getId());
+                .extracting("bankCode", "accountName", "accountNumber", "message", "userId")
+                .contains("001", "홍길동", "123456789", "정산 요청합니다.", user.getId());
 
     }
 

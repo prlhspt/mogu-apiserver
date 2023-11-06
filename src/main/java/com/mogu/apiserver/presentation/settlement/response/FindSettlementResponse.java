@@ -28,9 +28,6 @@ public class FindSettlementResponse {
     @Schema(description = "메세지", example = "정산 요청합니다.")
     private String message;
 
-    @Schema(description = "총 금액", example = "10000")
-    private Long totalPrice;
-
     @Schema(description = "정산 요청자의 ID", example = "1")
     private Long userId;
 
@@ -46,7 +43,6 @@ public class FindSettlementResponse {
                 .accountName(settlement.getAccountName())
                 .accountNumber(settlement.getAccountNumber())
                 .message(settlement.getMessage())
-                .totalPrice(settlement.getTotalPrice())
                 .userId(settlement.getUser().getId())
                 .settlementImages((settlement.getSettlementImages() != null)
                         ? settlement.getSettlementImages().stream()
@@ -67,6 +63,9 @@ public class FindSettlementResponse {
         @Schema(description = "정산 단계 레벨", example = "1")
         private Integer level;
 
+        @Schema(description = "총 금액", example = "10000")
+        private Long totalPrice;
+
         @Schema(description = "정산 참여자")
         private List<FindSettlementParticipantResponse> participants;
 
@@ -75,6 +74,7 @@ public class FindSettlementResponse {
                     .map(settlementStage -> FindSettlementStageResponse.builder()
                             .id(settlementStage.getId())
                             .level(settlementStage.getLevel())
+                            .totalPrice(settlementStage.getTotalPrice())
                             .participants(FindSettlementParticipantResponse.of(settlementStage.getSettlementParticipants()))
                             .build())
                     .collect(toList());
