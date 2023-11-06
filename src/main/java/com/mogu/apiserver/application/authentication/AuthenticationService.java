@@ -141,6 +141,7 @@ public class AuthenticationService {
 
         return RefreshTokenResponse.builder()
                 .accessToken(accessToken)
+                .userId(account.getUser().getId())
                 .build();
 
     }

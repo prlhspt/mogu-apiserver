@@ -1,6 +1,7 @@
 package com.mogu.apiserver.presentation.authentication;
 
 import com.mogu.apiserver.application.authentication.AuthenticationService;
+import com.mogu.apiserver.global.property.JwtProperty;
 import com.mogu.apiserver.global.util.ApiResponseEntity;
 import com.mogu.apiserver.presentation.authentication.request.AccountLoginRequest;
 import com.mogu.apiserver.presentation.authentication.request.RegisterRequest;
@@ -12,17 +13,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
-
-    public AuthenticationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+    private final JwtProperty jwtProperty;
 
     @Operation(summary = "회원가입")
     @ApiResponses(value = {
@@ -33,8 +35,12 @@ public class AuthenticationController {
                     content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
     })
     @PostMapping("/authentication/register")
-    public ApiResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ApiResponseEntity.ok(authenticationService.registerUser(request.toServiceRequest()));
+    public ApiResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request,
+                                                        HttpServletResponse response) {
+        RegisterResponse registerResponse = authenticationService.registerUser(request.toServiceRequest());
+        createCookie(response, registerResponse.getRefreshToken());
+
+        return ApiResponseEntity.ok(registerResponse);
     }
 
     @Operation(summary = "로그인")
@@ -46,8 +52,14 @@ public class AuthenticationController {
                     content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
     })
     @PostMapping("/authentication/login")
-    public ApiResponseEntity<AccountLoginResponse> authenticate(@Valid @RequestBody AccountLoginRequest request) {
-        return ApiResponseEntity.ok(authenticationService.login(request.toServiceRequest()));
+    public ApiResponseEntity<AccountLoginResponse> authenticate(@Valid @RequestBody AccountLoginRequest request,
+                                                                HttpServletResponse response) {
+
+        AccountLoginResponse accountLoginResponse = authenticationService.login(request.toServiceRequest());
+
+        createCookie(response, accountLoginResponse.getRefreshToken());
+
+        return ApiResponseEntity.ok(accountLoginResponse);
     }
 
     @Operation(summary = "토큰 재발급")
@@ -59,8 +71,17 @@ public class AuthenticationController {
                     content = {@Content(schema = @Schema(implementation = ApiResponseEntity.class))}),
     })
     @PutMapping("/authentication/refresh")
-    public ApiResponseEntity<RefreshTokenResponse> refresh(@RequestHeader("Authorization") String token) {
-        return ApiResponseEntity.ok(authenticationService.refresh(token.substring(7)));
+    public ApiResponseEntity<RefreshTokenResponse> refresh(@CookieValue(name = "refreshToken") String refreshToken) {
+        return ApiResponseEntity.ok(authenticationService.refresh(refreshToken));
+    }
+
+    private void createCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(jwtProperty.refreshTokenExpireTime.intValue());
+
+        response.addCookie(cookie);
     }
 
 }
