@@ -14,26 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
-        return new WebMvcConfigurer() {
-
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods(
-                                HttpMethod.GET.name(),
-                                HttpMethod.POST.name(),
-                                HttpMethod.PUT.name(),
-                                HttpMethod.PATCH.name(),
-                                HttpMethod.DELETE.name()
-                        )
-                        .allowedHeaders("*");
-            }
-        };
-    }
-
-    @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .registerModule(new Jdk8Module())
