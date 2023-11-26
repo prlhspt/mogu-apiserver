@@ -78,6 +78,7 @@ public class AuthenticationController {
     private void createCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         cookie.setMaxAge(jwtProperty.refreshTokenExpireTime.intValue());
 
         response.addCookie(cookie);
